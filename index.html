@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <title>Software Ferreira - Caminho do Guerreiro</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" sizes="192x192" href="brasao-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="brasao-512.png">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Stoic Warrior">
+
+    <meta name="theme-color" content="#0A0A0A">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ============================================================
+           VARIÁVEIS DE DESIGN - ESTÉTICA ESTOICA (SOFTWARE FERREIRA)
+           ============================================================ */
+        :root {
+            --cor-ouro: #D4AF37;
+            --cor-ouro-brilho: #F9E076;
+            --cor-pedra: #3A3A3A;
+            --cor-marmore: #E0E0E0;
+            --cor-preto-profundo: #0A0A0A;
+            --cor-creme-antigo: #FDF5E6;
+            --cor-sucesso: #2E7D32;
+            --cor-perigo: #C62828;
+            --cor-premium: #1A237E;
+            
+            --sombra-card: 0 10px 20px rgba(0,0,0,0.3);
+            --borda-ouro: 2px solid var(--cor-ouro);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Temas */
+        body.dark-mode {
+            --bg-app: #121212;
+            --bg-card: #1E1E1E;
+            --texto-p: #F5F5F5;
+            --texto-s: #B0B0B0;
+            --borda-suave: #333;
+        }
+
+        body.light-mode {
+            --bg-app: #F0F0F0;
+            --bg-card: #FFFFFF;
+            --texto-p: #1A1A1A;
+            --texto-s: #555555;
+            --borda-suave: #DDD;
+        }
+
+        /* Reset e Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-app);
+            color: var(--texto-p);
+            line-height: 1.6;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* BLOQUEIO DE INTERAÇÃO - PARTE 1 */
+        body.app-travado #main-scroll-container {
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        /* Container Principal (SPA) */
+        #main-scroll-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 110px;
+            scroll-behavior: smooth;
+        }
+
+        .view-section {
+            display: none;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .view-section.active { display: block; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* HEADER SUPREMO - SOFTWARE FERREIRA */
+        header {
+            background: var(--bg-card);
+            padding: 15px 20px;
+            border-bottom: 3px solid var(--cor-ouro);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+
+        .brand-container { display: flex; align-items: center; gap: 10px; }
+        .logo-sigla {
+            background: var(--cor-ouro);
+            color: var(--cor-preto-profundo);
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            border-radius: 4px;
+            transform: rotate(-5deg);
+        }
+        .brand-text {
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            color: var(--cor-ouro);
+        }
+
+        /* STATUS BAR (XP / MOEDAS) */
+        .status-bar {
+            background: var(--cor-pedra);
+            padding: 5px 15px;
+            display: flex;
+            justify-content: space-around;
+            font-size: 0.75rem;
+            color: var(--cor-ouro);
+            border-bottom: 1px solid var(--cor-ouro);
+        }
+
+        /* BOTÕES E CARDS */
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 20px;
+            border: 1px solid var(--borda-suave);
+            position: relative;
+            box-shadow: var(--sombra-card);
+        }
+
+        .card-guerreiro { border-left: 5px solid var(--cor-ouro); }
+
+        .btn-guerreiro {
+            background: linear-gradient(135deg, var(--cor-ouro), #B8860B);
+            color: #000;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            width: 100%;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 0px #8B7500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-guerreiro:active { transform: translateY(2px); box-shadow: 0 2px 0px #8B7500; }
+
+        /* ESTILO PRO / LOCK */
+        .item-bloqueado {
+            position: relative;
+            opacity: 0.8;
+            filter: grayscale(0.5);
+        }
+        
+        /* NOVA CLASSE DE BLOQUEIO VISUAL */
+        .muralha-lock {
+            position: relative;
+            filter: blur(4px) brightness(0.5);
+            pointer-events: none;
+            user-select: none;
+        }
+        
+        .muralha-lock::after {
+            content: "\f023";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: var(--cor-ouro);
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.8);
+            z-index: 10;
+        }
+
+        .lock-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: var(--cor-ouro);
+            font-size: 1.2rem;
+        }
+
+        /* MURALHA DE BLOQUEIO */
+        #view-bloqueio {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .quadro-dourado {
+            border: 4px double var(--cor-ouro);
+            padding: 30px;
+            background: rgba(212, 175, 55, 0.05);
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+        .id-container {
+            background: #000;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px dashed var(--cor-ouro);
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 1.4rem;
+            color: var(--cor-ouro-brilho);
+        }
+        .input-ativacao {
+            width: 100%;
+            padding: 15px;
+            background: #111;
+            border: 1px solid var(--cor-ouro);
+            color: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* NAVEGAÇÃO INFERIOR */
+        nav#bottom-tabs {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: var(--bg-card);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 2px;
+            border-top: 2px solid var(--cor-ouro);
+            z-index: 2000;
+        }
+
+        .tab-item {
+            color: var(--texto-s);
+            text-decoration: none;
+            font-size: 0.58rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            flex: 1;
+            text-align: center;
+        }
+
+        .tab-item.active { color: var(--cor-ouro); }
+        .tab-item i { font-size: 1.15rem; }
+
+        /* PROGRESSO */
+        .progress-outer {
+            width: 100%;
+            height: 10px;
+            background: #333;
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress-inner {
+            height: 100%;
+            background: linear-gradient(90deg, var(--cor-ouro), var(--cor-ouro-brilho));
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        /* CIRCULO PROGRESSO (CALENDÁRIO) */
+        .circle-container { position: relative; width: 60px; height: 60px; }
+        .circle-bg { fill: none; stroke: #333; stroke-width: 3.8; }
+        .circle-fg { fill: none; stroke: var(--cor-ouro); stroke-width: 3.8; stroke-linecap: round; transition: stroke-dasharray 0.3s; }
+
+        /* TEXTOS */
+        .gold { color: var(--cor-ouro); }
+        .small { font-size: 0.8rem; color: var(--texto-s); }
+        .center { text-align: center; }
+        .italic { font-style: italic; }
+
+        /* ÁREA DE BACKUP */
+        #input-backup-texto {
+            width: 100%;
+            height: 80px;
+            background: #000;
+            color: var(--cor-ouro);
+            border: 1px solid var(--cor-ouro);
+            border-radius: 5px;
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 0.7rem;
+            font-family: monospace;
+            resize: none;
+        }
+
+    </style>
+</head>
+<body class="dark-mode">
+
+    <header>
+        <div class="brand-container">
+            <div class="logo-sigla">SF</div>
+            <div class="brand-text">Software Ferreira</div>
+        </div>
+        <div style="display: flex; gap: 15px;">
+            <i class="fas fa-moon" onclick="toggleTheme()" id="theme-toggle"></i>
+            <i class="fas fa-cog" onclick="navegar('config')"></i>
+        </div>
+    </header>
+
+    <div class="status-bar">
+        <span><i class="fas fa-shield-alt"></i> Nível: <b id="stat-nivel">1</b></span>
+        <span><i class="fas fa-bolt"></i> XP: <b id="stat-xp">0</b></span>
+        <span><i class="fas fa-coins"></i> Moedas: <b id="stat-moedas">0</b></span>
+    </div>
+
+    <main id="main-scroll-container">
+
+        <section id="view-home" class="view-section active">
+            <div class="card card-guerreiro" onclick="atualizarFrase()">
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <div id="gladiador-avatar" style="font-size: 2.5rem;">🛡️</div>
+                    <div>
+                        <p class="small">O Mestre diz:</p>
+                        <p id="frase-gladiador" style="font-style: italic; font-weight: 500;">"A disciplina é a liberdade."</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h3 class="center gold">Domínio de Hoje</h3>
+                <div class="progress-outer">
+                    <div id="barra-progresso-hoje" class="progress-inner"></div>
+                </div>
+                <p class="center small"><span id="texto-progresso-hoje">0%</span> concluído</p>
+            </div>
+
+            <div id="home-habitos-container"></div>
+            
+            <button class="btn-guerreiro" onclick="navegar('habitos')" style="margin-top: 20px;">
+                <i class="fas fa-plus"></i> Gerenciar Pergaminho
+            </button>
+        </section>
+
+        <section id="view-habitos" class="view-section">
+            <h2 class="gold center">O Pergaminho</h2>
+            <p class="small center" style="margin-bottom: 20px;">Adicione ou remova as leis da sua rotina.</p>
+            <button class="btn-guerreiro" onclick="abrirModalHabito()" style="margin-bottom: 20px;">
+                <i class="fas fa-scroll"></i> Novo Hábito
+            </button>
+            <div id="lista-crud-habitos"></div>
+        </section>
+
+        <section id="view-valores" class="view-section">
+            <h2 class="gold center">Código do Guerreiro</h2>
+            <p class="center italic small" style="margin: 10px 0 20px 0; color: var(--cor-ouro-brilho);">
+                "Se você quebra seus valores, você quebra a si mesmo."
+            </p>
+            <div id="lista-valores-container"></div>
+            <button class="btn-guerreiro" onclick="abrirModalValor()" style="margin-top: 20px;">
+                <i class="fas fa-medal"></i> Novo Valor Inegociável
+            </button>
+        </section>
+
+        <section id="view-calendario" class="view-section">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <i class="fas fa-chevron-left gold" onclick="mudarMes(-1)"></i>
+                    <h3 id="cal-titulo" class="gold">Mês Atual</h3>
+                    <i class="fas fa-chevron-right gold" onclick="mudarMes(1)"></i>
+                </div>
+                <div id="cal-grade" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center;"></div>
+            </div>
+
+            <div class="card" style="border-top: 3px solid var(--cor-ouro);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div>
+                        <h4 id="data-selecionada-titulo" class="gold" style="font-size: 0.8rem;">ORDENS DE BATALHA</h4>
+                        <p class="small" style="font-size: 0.6rem;">Cumpra 100% para bônus de XP</p>
+                    </div>
+                    <div class="circle-container" style="position: relative; width: 50px; height: 50px;">
+                        <svg viewBox="0 0 36 36" style="width: 100%; height: 100%;">
+                            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#333" stroke-width="2" />
+                            <path id="circulo-progresso-tarefas" class="circle-fg" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--cor-ouro)" stroke-width="2" />
+                        </svg>
+                        <div id="texto-progresso-tarefas" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:0.6rem; font-weight:bold; color:var(--cor-ouro)">0%</div>
+                    </div>
+                </div>
+
+                <div id="lista-tarefas-batalha"></div>
+                
+                <button class="btn-guerreiro" id="btn-nova-tarefa" onclick="abrirModalNovaTarefa()" style="margin-top: 15px; padding: 10px; font-size: 0.7rem;">
+                    <i class="fas fa-plus-circle"></i> Emitir Nova Ordem
+                </button>
+            </div>
+        </section>
+
+        <section id="view-desafios" class="view-section">
+            <h2 class="gold center">Provas de Fogo</h2>
+            <div id="container-desafios"></div>
+        </section>
+
+        <section id="view-vicios" class="view-section">
+            <h2 class="gold center">Domínio Próprio</h2>
+            <div id="vicios-lista"></div>
+            <button class="btn-guerreiro" onclick="abrirModalVicio()" style="margin-top: 20px;">+ Registrar Fraqueza</button>
+        </section>
+
+        <section id="view-premium" class="view-section">
+            <div class="card" style="border: 2px solid var(--cor-ouro); background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://www.transparenttextures.com/patterns/marble-similar.png');">
+                <h2 class="gold center">🏛️ ACADEMIA SUPERIOR</h2>
+                <p class="small center">Conhecimento avançado para a evolução total.</p>
+            </div>
+            <div id="lista-ebooks"></div>
+        </section>
+
+        <section id="view-config" class="view-section">
+            <h2 class="gold center">Oficina do Guerreiro</h2>
+            
+            <div class="card" style="border: 1px solid var(--cor-ouro); background: rgba(212,175,55,0.05); text-align: center;">
+                <p class="small gold" style="text-transform: uppercase; margin-bottom: 5px;">Sua Identidade Digital</p>
+                
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 15px;">
+                    <div id="config-id-display" style="font-family: monospace; font-size: 1.2rem; color: #fff;">Aguardando...</div>
+                    <button class="btn-guerreiro" onclick="copiarID()" style="width: auto; padding: 5px 15px; font-size: 0.7rem; background: #333; box-shadow: none;">
+                        <i class="fas fa-copy"></i> COPIAR MEU ID
+                    </button>
+                </div>
+                
+                <button class="btn-guerreiro" onclick="window.open('https://pay.kiwify.com.br/xNy973L', '_blank')" style="background: linear-gradient(45deg, #1A237E, #D4AF37); margin-bottom: 15px;">
+                    <i class="fas fa-crown"></i> 👑 TORNAR-SE PRO
+                </button>
+
+                <div style="border-top: 1px solid #444; padding-top: 15px; margin-top: 5px;">
+                    <p class="small">Possui uma chave de ativação?</p>
+                    <input type="number" id="input-chave-config" class="input-ativacao" placeholder="Chave de 4 dígitos" style="margin: 10px 0; width: 80%;">
+                    <button class="btn-guerreiro" onclick="validarChaveDireta()" style="background: transparent; border: 1px solid var(--cor-ouro); color: var(--cor-ouro); font-size: 0.8rem; box-shadow: none;">
+                        LIBERAR ACESSO ELITE
+                    </button>
+                </div>
+            </div>
+
+            <div class="card card-guerreiro">
+                <p class="gold small center" style="margin-bottom:10px;">⚔️ CÓDIGO DO GUERREIRO</p>
+                <button class="btn-guerreiro" onclick="exportarDadosTexto()" style="margin-bottom:10px;">
+                    <i class="fas fa-shield-virus"></i> Gerar Código de Honra
+                </button>
+                <textarea id="input-backup-texto" style="width:100%; height:60px; background:#111; color:#ccc; border:1px solid #333;" placeholder="Cole aqui seu Código de Honra..."></textarea>
+                <button class="btn-guerreiro" onclick="importarDadosTexto()" style="background:#333; margin-top:10px;">
+                    <i class="fas fa-scroll"></i> Restaurar via Código
+                </button>
+            </div>
+        </section>
+
+        <section id="view-bloqueio" class="view-section">
+            <div class="quadro-dourado" style="text-align: center; padding: 20px;">
+                <div class="logo-sigla" style="width: 60px; height: 60px; font-size: 1.5rem; margin: 0 auto 20px auto; border: 2px solid var(--cor-ouro); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--cor-ouro);">SF</div>
+                <h2 class="gold">PROVE SUA HONRA</h2>
+                <p style="margin-top: 10px; font-size: 0.9rem;">O tempo de teste (20 dias) expirou. Somente os guerreiros comprometidos com a evolução herdarão o acesso total ao sistema.</p>
+                
+                <div class="id-container" style="margin: 20px 0;">
+                    <p style="font-size: 0.65rem; color: #888; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px;">ID DE INSTALAÇÃO DO GUERREIRO</p>
+                    <span id="display-id-instalacao" style="color: #fff; font-weight: bold;">GERANDO ID...</span>
+                </div>
+                
+                <button class="btn-guerreiro" onclick="copiarID()" style="background: #333; margin-bottom: 20px; font-size: 0.7rem; padding: 8px;">
+                    <i class="fas fa-copy"></i> COPIAR ID
+                </button>
+
+                <button class="btn-guerreiro" onclick="window.open('https://pay.kiwify.com.br/xNy973L', '_blank')">
+                    <i class="fas fa-crown"></i> OBTER CHAVE DE ACESSO PRO
+                </button>
+
+                <div style="margin-top: 30px; border-top: 1px solid #333; padding-top: 20px;">
+                    <p class="small">Já possui sua chave de honra?</p>
+                    <input type="number" id="input-chave-ativacao" class="input-ativacao" placeholder="Digite sua chave de 4 dígitos" style="width: 80%; margin: 10px 0;">
+                    <button class="btn-guerreiro" onclick="validarChaveDireta()" style="background: #222; color: var(--cor-ouro); border: 1px solid var(--cor-ouro); box-shadow: none; font-size: 0.8rem;">
+                        LIBERAR ACESSO
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <nav id="bottom-tabs">
+        <a href="javascript:void(0)" class="tab-item active" onclick="navegar('home')" id="tab-home">
+            <i class="fas fa-fort-awesome"></i><span>Home</span>
+        </a>
+        <a href="javascript:void(0)" class="tab-item" onclick="navegar('valores')" id="tab-valores">
+            <i class="fas fa-medal"></i><span>Honra</span>
+        </a>
+        <a href="javascript:void(0)" class="tab-item" onclick="navegar('desafios')" id="tab-desafios">
+            <i class="fas fa-fire"></i><span>Desafios</span>
+        </a>
+        <a href="javascript:void(0)" class="tab-item" onclick="navegar('calendario')" id="tab-calendario">
+            <i class="fas fa-calendar-alt"></i><span>Agenda</span>
+        </a>
+        <a href="javascript:void(0)" class="tab-item" onclick="navegar('vicios')" id="tab-vicios">
+            <i class="fas fa-shield-halved"></i><span>Escudo</span>
+        </a>
+        <a href="javascript:void(0)" class="tab-item" onclick="navegar('premium')" id="tab-premium">
+            <i class="fas fa-crown"></i><span>Elite</span>
+        </a>
+    </nav>
+    <script>
+    /* ============================================================
+       1. REGISTRO DO ESCUDO OFFLINE (SERVICE WORKER) 
+       ============================================================ */
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Escudo Offline Ativado!', reg))
+                .catch(err => console.log('Erro ao ativar escudo:', err));
+        });
+    }
+
+    /* ============================================================
+       2. BANCO DE DADOS - ESTRUTURA COMPLETA (SOFTWARE FERREIRA)
+       ============================================================ */
+    
+    const DB_NOME = "SoftwareFerreira_CaminhoGuerreiro_v2";
+
+    // Geração única de ID e Data de Instalação para novos usuários
+    const novoId = Math.floor(Math.random() * 9000) + 1000;
+    const dataAgora = Date.now();
+
+    const dadosIniciais = {
+        usuario: {
+            nome: "Guerreiro",
+            xp: 0,
+            nivel: 1,
+            moedas: 0,
+            streak: 0,
+            totalConcluido: 0,
+            ultimaVisita: new Date().toLocaleDateString('pt-BR'),
+            idInstalacao: novoId,
+            dataInstalacao: dataAgora,
+            isPro: false
+        },
+        habitos: [
+            { id: 1, nome: "Meditar ou Orar", desc: "5-10 min de introspecção", tipo: "check", cat: "Mente", diff: 1, freq: "fixo", xp: 20 },
+            { id: 2, nome: "Leitura Estoica", desc: "Mínimo 10 min de sabedoria", tipo: "check", cat: "Mente", diff: 1, freq: "fixo", xp: 25 },
+            { id: 3, nome: "Refletir sobre Metas", desc: "Escrever ou planejar o dia", tipo: "check", cat: "Mente", diff: 1, freq: "fixo", xp: 15 },
+            { id: 4, nome: "Foco Total (Anti-Procrastinação)", desc: "Trabalho profissional sem distrações", tipo: "check", cat: "Mente", diff: 3, freq: "fixo", xp: 50 },
+            { id: 5, nome: "Hidratação Real", desc: "Beber 2.5L de água", tipo: "contador", meta: 5, progresso: 0, cat: "Corpo", diff: 1, freq: "fixo", xp: 30 },
+            { id: 6, nome: "Treino de Calistenia", desc: "Hipertrofia e força em casa", tipo: "check", cat: "Corpo", diff: 3, freq: "fixo", xp: 60 },
+            { id: 7, nome: "Sono do Guerreiro", desc: "7-8 horas de descanso", tipo: "check", cat: "Corpo", diff: 1, freq: "fixo", xp: 20 },
+            { id: 8, nome: "Alimentação Limpa", desc: "Evitar açúcar e ultraprocessados", tipo: "check", cat: "Corpo", diff: 2, freq: "fixo", xp: 40 },
+            { id: 9, nome: "Estudo Útil", desc: "Mínimo 20 min de aprendizado", tipo: "check", cat: "Evolução", diff: 2, freq: "fixo", xp: 35 },
+            { id: 10, nome: "Objetivo Pessoal", desc: "Avançar em seu projeto", tipo: "check", cat: "Evolução", diff: 3, freq: "fixo", xp: 55 },
+            { id: 11, nome: "Acordar Cedo", desc: "Vencer o primeiro combate: a cama", tipo: "check", cat: "Disciplina", diff: 2, freq: "fixo", xp: 40 },
+            { id: 12, nome: "Tarefa Difícil Primeiro", desc: "Engolir o sapo logo cedo", tipo: "check", cat: "Disciplina", diff: 3, freq: "fixo", xp: 50 },
+            { id: 13, nome: "Jejum de Redes Sociais", desc: "Evitar scroll infinito", tipo: "check", cat: "Disciplina", diff: 2, freq: "fixo", xp: 30 }
+        ],
+        tarefas: [], 
+        progressoTarefas: {}, 
+        valoresGuerreiro: [
+            { id: 201, titulo: "Honestidade", desc: "Ser verdadeiro consigo mesmo e com os outros.", icone: "fa-sun" },
+            { id: 202, titulo: "Responsabilidade", desc: "Assumir as próprias escolhas e consequências.", icone: "fa-hand-holding-hand" },
+            { id: 203, titulo: "Disciplina", desc: "Fazer o que precisa ser feito, mesmo sem vontade.", icone: "fa-fire-alt" },
+            { id: 204, titulo: "Perseverança", desc: "Continuar mesmo quando fica difícil.", icone: "fa-mountain" },
+            { id: 205, titulo: "Empatia", desc: "Entender os outros para liderar melhor.", icone: "fa-heart" },
+            { id: 206, titulo: "Humildade", desc: "Reconhecer erros e estar sempre aberto a aprender.", icone: "fa-graduation-cap" },
+            { id: 207, titulo: "Coragem", desc: "Enfrentar medos e esmagar a zona de conforto.", icone: "fa-shield-halved" },
+            { id: 208, titulo: "Respeito", desc: "Honrar quem veio antes e a base da convivência.", icone: "fa-handshake" },
+            { id: 209, titulo: "Autoconfiança", desc: "Acreditar na própria capacidade de evoluir.", icone: "fa-bolt" },
+            { id: 210, titulo: "Integridade", desc: "Agir conforme seus valores, mesmo quando ninguém vê.", icone: "fa-gem" }
+        ],
+        registros: {}, 
+        vicios: [
+            { id: 101, nome: "Procrastinação", diasLimpos: 0, ultimaRecaida: null, historico: [] }
+        ],
+        desafios: [
+            { id: 7, nome: "Semana de Ferro", dias: 7, recompensa: 500, ativo: false, progresso: 0 },
+            { id: 20, nome: "Hábito de Aço", dias: 20, recompensa: 2000, ativo: false, progresso: 0 },
+            { id: 40, nome: "Quarentena do Guerreiro", dias: 40, recompensa: 5000, ativo: false, progresso: 0, pro: true },
+            { id: 60, nome: "Forja da Alma", dias: 60, recompensa: 10000, ativo: false, progresso: 0, pro: true },
+            { id: 90, nome: "Legado do Imperador", dias: 90, recompensa: 25000, ativo: false, progresso: 0, pro: true }
+        ],
+        conquistas: [],
+        inventario: [],
+        config: { tema: 'dark' }
+    };
+
+    let db = JSON.parse(localStorage.getItem(DB_NOME)) || dadosIniciais;
+
+    // Migração de Segurança para manter ID fixo
+    if (!db.usuario.idInstalacao) {
+        db.usuario.idInstalacao = novoId;
+        db.usuario.dataInstalacao = dataAgora;
+    }
+    if (db.usuario.isPro === undefined) db.usuario.isPro = false;
+
+    function salvarDB() {
+        localStorage.setItem(DB_NOME, JSON.stringify(db));
+    }
+
+    /* ============================================================
+       RELÓGIO DO DESTINO - CONTROLE DE ACESSO (TRAVA REAL)
+       ============================================================ */
+    
+    function verificarBloqueio() {
+        if (db.usuario.isPro) {
+            document.body.classList.remove('app-travado');
+            const tabs = document.getElementById('bottom-tabs');
+            if (tabs) tabs.style.display = 'flex';
+            return false;
+        }
+
+        const agora = Date.now();
+        const vinteDiasEmMs = 20 * 24 * 60 * 60 * 1000;
+        const tempoPassado = agora - db.usuario.dataInstalacao;
+
+        if (tempoPassado > vinteDiasEmMs) {
+            // TRAVA TOTAL - PARTE 2
+            document.body.classList.add('app-travado');
+            
+            const tabs = document.getElementById('bottom-tabs');
+            if (tabs) tabs.style.display = 'none';
+            
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            const viewLock = document.getElementById('view-bloqueio');
+            if (viewLock) viewLock.classList.add('active');
+
+            // Atualiza o ID na tela de bloqueio
+            const displayId = document.getElementById('display-id-instalacao');
+            if (displayId) displayId.innerText = db.usuario.idInstalacao;
+
+            return true;
+        }
+        return false;
+    }
+
+    /* ============================================================
+       FUNÇÃO COPIAR ID - PARTE 2
+       ============================================================ */
+    function copiarID() {
+        const id = db.usuario.idInstalacao;
+        navigator.clipboard.writeText(id).then(() => {
+            alert("ID de Instalação copiado: " + id + "\nEnvie este ID para obter sua chave PRO.");
+        });
+    }
+
+    /* ============================================================
+       SISTEMA DE NAVEGAÇÃO E TEMAS (COM BLOQUEIO ESTÁTICO)
+       ============================================================ */
+    
+    function navegar(telaId) {
+        // Bloqueio Total após 20 dias (Exceto se for PRO)
+        if (verificarBloqueio()) return;
+
+        document.querySelectorAll('.view-section').forEach(section => {
+            section.classList.remove('active');
+        });
+
+        const target = document.getElementById('view-' + telaId);
+        if (target) target.classList.add('active');
+
+        document.querySelectorAll('.tab-item').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        const activeTab = document.getElementById('tab-' + telaId);
+        if (activeTab) activeTab.classList.add('active');
+
+        // Renderizações específicas
+        if (telaId === 'home') renderizarHome();
+        if (telaId === 'habitos') renderizarCRUD();
+        if (telaId === 'valores') renderizarValores(); 
+        if (telaId === 'calendario') inicializarCalendario();
+        if (telaId === 'vicios') renderizarVicios();
+        if (telaId === 'premium') renderizarPremium();
+        if (telaId === 'desafios') renderizarDesafios();
+        if (telaId === 'config') {
+            document.getElementById('config-id-display').innerText = db.usuario.idInstalacao;
+        }
+
+        document.getElementById('main-scroll-container').scrollTop = 0;
+    }
+
+    function toggleTheme() {
+        const body = document.body;
+        const icon = document.getElementById('theme-toggle');
+        
+        if (body.classList.contains('dark-mode')) {
+            body.classList.replace('dark-mode', 'light-mode');
+            icon.classList.replace('fa-moon', 'fa-sun');
+            db.config.tema = 'light';
+        } else {
+            body.classList.replace('light-mode', 'dark-mode');
+            icon.classList.replace('fa-sun', 'fa-moon');
+            db.config.tema = 'dark';
+        }
+        salvarDB();
+    }
+
+    /* ============================================================
+       MECANISMO DE STREAK E DATAS
+       ============================================================ */
+    
+    function getHoje() {
+        return new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+    }
+
+    function formatarDataParaID(dataObj) {
+        const d = String(dataObj.getDate()).padStart(2, '0');
+        const m = String(dataObj.getMonth() + 1).padStart(2, '0');
+        const y = dataObj.getFullYear();
+        return `${d}-${m}-${y}`;
+    }
+
+    function validarSessao() {
+        const hoje = getHoje();
+        const ultima = db.usuario.ultimaVisita;
+
+        if (ultima !== hoje) {
+            const ontemObj = new Date();
+            ontemObj.setDate(ontemObj.getDate() - 1);
+            const dataOntem = formatarDataParaID(ontemObj);
+
+            if (!db.registros[dataOntem] || db.registros[dataOntem].length === 0) {
+                db.usuario.streak = 0;
+            }
+            db.usuario.ultimaVisita = hoje;
+            salvarDB();
+        }
+        verificarBloqueio();
+    }
+
+    /* ============================================================
+       FRASES DO MESTRE
+       ============================================================ */
+    const frasesGladiador = [
+        "A sorte favorece os destemidos, guerreiro.",
+        "Não é porque as coisas são difíceis que não ousamos; é porque não ousamos que elas são difíceis.",
+        "O homem que domina a si mesmo é o maior dos impérios.",
+        "Lembre-se: o obstáculo é o caminho.",
+        "O suor no treino poupa o sangue na batalha.",
+        "A disciplina é o fogo que forja o aço da sua alma.",
+        "Sua vontade deve ser mais forte que sua maior desculpa.",
+        "A excelência não é um ato, mas um hábito.",
+        "A queda não é o fim, a permanência no chão sim.",
+        "Um guerreiro não desiste do que ama, ele encontra amor no que faz.",
+        "A dor é o mensageiro da evolução.",
+        "Não reze por uma vida fácil, reze por forças para suportar uma difícil.",
+        "O guerreiro que treina na paz, não sangra na guerra.",
+        "Seja como a água: adapte-se, mas nunca perca sua força.",
+        "A disciplina é a ponte entre seus objetivos e suas conquistas.",
+        "O medo é um mentiroso; não dê ouvidos a ele.",
+        "Vencer a si mesmo é a maior das vitórias.",
+        "Um passo de cada vez, mas nunca para trás.",
+        "O caráter de um homem é o seu destino.",
+        "Domine sua manhã e você dominará seu dia.",
+        "A consistência derrota o talento quando o talento não tem disciplina.",
+        "O segredo da saúde mental e física é não chorar pelo passado.",
+        "Sua vontade deve ser como o aço: forjada no fogo e temperada no gelo.",
+        "O conforto é o assassino do progresso.",
+        "A raiva é uma conselheira traiçoeira; mantenha a calma.",
+        "Transforme sua dor em combustível para sua jornada.",
+        "Não espere por motivação; construa hábitos.",
+        "Onde há disciplina, há liberdade real.",
+        "Seja o mestre do seu destino, não o escravo dos seus desejos.",
+        "O silêncio é, muitas vezes, a resposta mais sábia.",
+        "Honre seus ancestrais com sua conduta impecável.",
+        "O fracasso é apenas um mestre disfarçado.",
+        "Não negocie com sua fraqueza. Esmague-a.",
+        "A excelência nasce do que você faz quando ninguém está olhando.",
+        "Se você cansar, aprenda a descansar, não a desistir.",
+        "O tempo é seu recurso mais escasso; use-o com sabedoria.",
+        "Mantenha o foco. O que não te desafia, não te transforma.",
+        "A vida não fica mais fácil, você é que fica mais forte.",
+        "Grandes impérios não caem por ataques externos, mas por fraqueza interna.",
+        "O suor de hoje é a armadura de amanhã.",
+        "O arrependimento pesa toneladas; a disciplina pesa gramas.",
+         "A sorte é o encontro da preparação com a oportunidade.",
+        "Sua palavra deve ser seu contrato sagrado.",
+        "A verdadeira riqueza é o controle absoluto sobre si mesmo.",
+        "Você é o arquiteto da sua própria alma.",
+        "O destino favorece os audazes.",
+        "Não olhe para os lados; olhe para o topo.",
+        "A persistência vence o cansaço.",
+        "O gladiador que não treina, já entra derrotado na arena.",
+        "Sua mente é sua fortaleza; proteja os portões.",
+        "A paciência é a virtude dos fortes.",
+        "Vencer uma vez é sorte; vencer todos os dias é hábito.",
+        "Não reclame do que você permite.",
+        "O que você faz repetidamente define quem você é.",
+        "Seja a rocha que as ondas batem e não movem.",
+        "A força não vem da capacidade física, mas de uma vontade indomável.",
+        "Não viva para que sua presença seja notada, mas para que sua falta seja sentida.",
+        "A simplicidade é o último grau da sofisticação.",
+        "Quem tem um 'porquê' forte suporta qualquer 'como'.",
+        "A disciplina é o fogo que forja o aço da alma.",
+        "O foco é sua arma mais poderosa; mire com precisão.",
+        "A vitória pertence àqueles que acreditam nela por mais tempo.",
+        "Seja humilde para aprender e determinado para executar.",
+        "O corpo alcança o que a mente acredita.",
+        "Sua vida é o resultado das suas escolhas, não das suas desculpas.",
+        "A excelência não é um ato isolado, é um estilo de vida.",
+        "Não fale. Aja. Não diga. Mostre.",
+        "O caminho do guerreiro é solitário, mas a vista é recompensadora.",
+        "A dor da disciplina dói menos que a dor do fracasso.",
+        "A coragem não é a ausência de medo, mas o domínio sobre ele.",
+        "Sua conduta define sua linhagem.",
+        "O sábio fala porque tem algo a dizer; o tolo porque tem que dizer algo.",
+        "Mantenha sua mente calma no centro da tempestade.",
+        "A maior glória não é nunca cair, mas levantar-se após cada queda.",
+        "O segredo do sucesso é a constância no propósito.",
+        "Não deixe que o ruído das opiniões alheias cale sua voz interior.",
+        "Sua maior luta é contra a versão de você que quer desistir.",
+        "O mundo pertence aos disciplinados.",
+        "Cada 'não' para o vício é um 'sim' para sua grandeza.",
+        "A autodisciplina é o maior ato de amor-próprio.",
+        "Não conte seus planos; mostre seus resultados.",
+        "A preguiça é o ladrão que rouba o seu futuro.",
+        "Honre seu suor.",
+        "Onde não há luta, não há força.",
+        "Sua mente deve ser mais afiada que sua espada.",
+        "A vida é 10% o que acontece e 90% como você reage.",
+        "Quem domina a própria língua domina a própria vida.",
+        "A arrogância precede a queda; a humildade precede a glória.",
+        "Trabalhe em silêncio; deixe que o sucesso faça o barulho.",
+        "Você não é o que você diz que vai fazer, você é o que você faz.",
+        "A verdadeira liberdade é o controle sobre os impulsos.",
+        "O mestre já falhou mais vezes do que o iniciante sequer tentou.",
+        "Mantenha a guarda alta e a mente limpa.",
+        "O suor limpa a alma.",
+        "Cada dia é uma nova batalha; vença-a.",
+        "Não espere condições perfeitas para agir.",
+        "A forja da alma nunca para.",
+        "Seja um exemplo, não apenas uma opinião.",
+        "O cansaço passa, o resultado permanece.",
+        "Siga o Caminho do Guerreiro até o fim."
+    ];
+
+    function atualizarFrase() {
+        const el = document.getElementById('frase-gladiador');
+        if (el) {
+            el.innerText = `"${frasesGladiador[Math.floor(Math.random() * frasesGladiador.length)]}"`;
+        }
+    }
+
+    // Inicialização
+    validarSessao();
+</script>
+<script>
+    /* ============================================================
+       SISTEMA DE SEGURANÇA: PORTEIRO PRO (PARTE 3) - ATUALIZADO
+       ============================================================ */
+    
+    function verificarAcessoPro(recursoId) {
+        // Se já for PRO, acesso total liberado
+        if (db.usuario.isPro) return true;
+
+        // Se o recurso for o manual básico, acesso liberado para todos
+        if (recursoId === 'manual') return true;
+
+        // Recupera o ID para mostrar no alerta
+        const idGuerreiro = db.usuario.idInstalacao;
+
+        // Mensagem personalizada com o ID de Instalação
+        const mensagem = `🏛️ RECURSO PARA ELITE\n\nEste conteúdo é exclusivo para Guerreiros PRO.\n\nSEU ID DE INSTALAÇÃO: ${idGuerreiro}\n(Você precisará deste ID no portal para gerar sua chave).`;
+        
+        if (confirm(mensagem + "\n\nDeseja ir para o portal de ativação agora?")) {
+            window.open('https://pay.kiwify.com.br/xNy973L', '_blank');
+        }
+        
+        return false;
+    }
+
+    /* ============================================================
+       RENDERIZAÇÃO DA HOME (PAINEL DINÂMICO)
+       ============================================================ */
+    
+    function renderizarHome() {
+        const container = document.getElementById('home-habitos-container');
+        const hoje = getHoje();
+        
+        if (!db.registros[hoje]) db.registros[hoje] = [];
+        
+        container.innerHTML = '';
+        atualizarInterfaceStatus();
+
+        const categorias = ["Mente", "Corpo", "Evolução", "Disciplina"];
+        const iconesCat = { "Mente": "🧠", "Corpo": "💪", "Evolução": "📚", "Disciplina": "⚔️" };
+
+        categorias.forEach(cat => {
+            const habitosDaCat = db.habitos.filter(h => h.cat === cat);
+            if (habitosDaCat.length > 0) {
+                const section = document.createElement('div');
+                section.innerHTML = `<h4 class="gold" style="margin: 15px 0 10px 5px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
+                                    ${iconesCat[cat]} ${cat}</h4>`;
+                
+                habitosDaCat.forEach(habito => {
+                    const concluido = db.registros[hoje].includes(habito.id);
+                    
+                    const item = document.createElement('div');
+                    item.className = `card ${concluido ? 'concluido-anim' : ''}`;
+                    item.style = `display: flex; justify-content: space-between; align-items: center; border-left: 4px solid ${concluido ? 'var(--cor-sucesso)' : 'var(--cor-ouro)'}; padding: 12px; margin-bottom: 8px; transition: var(--transition); opacity: ${concluido ? '0.7' : '1'}`;
+                    
+                    item.innerHTML = `
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; font-size: 0.95rem; color: ${concluido ? 'var(--cor-sucesso)' : 'inherit'}">${habito.nome}</div>
+                            <div class="small">${habito.desc}</div>
+                            <div style="font-size: 0.6rem; color: var(--cor-ouro); font-weight: bold; margin-top: 2px;">
+                                +${habito.xp} XP | ${habito.freq === 'fixo' ? 'DIÁRIO' : 'EXTRA'}
+                            </div>
+                        </div>
+                        <div class="check-area">
+                            ${habito.tipo === 'check' 
+                                ? `<button onclick="alternarHabito(${habito.id})" style="background: none; border: none; color: ${concluido ? 'var(--cor-sucesso)' : 'var(--cor-ouro)'}; font-size: 1.8rem; cursor: pointer; transition: 0.2s;">
+                                    <i class="${concluido ? 'fas fa-check-circle' : 'far fa-circle'}"></i>
+                                   </button>`
+                                : `<div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); padding: 5px 10px; border-radius: 20px; border: 1px solid var(--cor-ouro);">
+                                    <button onclick="ajustarContador(${habito.id}, -1)" style="background:none; border:none; color:var(--cor-ouro); font-weight:bold;">-</button>
+                                    <span style="font-weight:bold; font-size: 0.8rem;">${habito.progresso || 0}/${habito.meta}</span>
+                                    <button onclick="ajustarContador(${habito.id}, 1)" style="background:none; border:none; color:var(--cor-ouro); font-weight:bold;">+</button>
+                                   </div>`
+                            }
+                        </div>
+                    `;
+                    section.appendChild(item);
+                });
+                container.appendChild(section);
+            }
+        });
+
+        calcularProgressoDiario();
+    }
+
+    /* ============================================================
+       SISTEMA: LÓGICA DE HONRA (CÓDIGO DO GUERREIRO)
+       ============================================================ */
+
+    function renderizarValores() {
+        const container = document.getElementById('lista-valores-container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        db.valoresGuerreiro.forEach(valor => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style = 'border-top: 2px solid var(--cor-ouro); margin-bottom: 15px;';
+            card.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="background: var(--cor-ouro); color: #000; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                        <i class="fas ${valor.icone || 'fa-medal'}"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <h4 class="gold" style="text-transform: uppercase; margin-bottom: 3px;">${valor.titulo}</h4>
+                        <p class="small" style="font-style: italic;">"${valor.desc}"</p>
+                    </div>
+                    <button onclick="removerValor(${valor.id})" style="background:none; border:none; color:var(--cor-perigo); cursor:pointer;">
+                        <i class="fas fa-trash-can"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function abrirModalValor() {
+        const titulo = prompt("Qual o nome do seu Valor Inegociável?");
+        if (!titulo) return;
+        const desc = prompt("Descreva o significado deste valor:");
+        if (!desc) return;
+
+        db.valoresGuerreiro.push({
+            id: Date.now(),
+            titulo: titulo,
+            desc: desc,
+            icone: "fa-medal"
+        });
+        salvarDB();
+        renderizarValores();
+        vibrar(50);
+    }
+
+    function removerValor(id) {
+        if (confirm("Deseja remover este valor?")) {
+            db.valoresGuerreiro = db.valoresGuerreiro.filter(v => v.id !== id);
+            salvarDB();
+            renderizarValores();
+        }
+    }
+
+    /* ============================================================
+       LÓGICA DE EXECUÇÃO E GAMIFICAÇÃO
+       ============================================================ */
+
+    function alternarHabito(id) {
+        const hoje = getHoje();
+        if (!db.registros[hoje]) db.registros[hoje] = [];
+        const index = db.registros[hoje].indexOf(id);
+        const habito = db.habitos.find(h => h.id === id);
+        
+        const valorXP = habito.xp;
+        const valorMoedas = Math.floor(habito.xp / 10);
+
+        if (index === -1) {
+            db.registros[hoje].push(id);
+            db.usuario.xp += valorXP;
+            db.usuario.moedas += valorMoedas;
+            vibrar(50);
+        } else {
+            db.registros[hoje].splice(index, 1);
+            db.usuario.xp = Math.max(0, db.usuario.xp - valorXP);
+            db.usuario.moedas = Math.max(0, db.usuario.moedas - valorMoedas);
+            vibrar([30, 30]);
+        }
+        
+        verificarLevelUp();
+        salvarDB();
+        renderizarHome();
+        atualizarInterfaceStatus();
+    }
+
+    function ajustarContador(id, valor) {
+        const habito = db.habitos.find(h => h.id === id);
+        if (habito.progresso === undefined) habito.progresso = 0;
+        habito.progresso = Math.max(0, habito.progresso + valor);
+        
+        const hoje = getHoje();
+        const jaConcluido = db.registros[hoje].includes(id);
+
+        if (habito.progresso >= habito.meta && !jaConcluido) {
+            alternarHabito(id);
+        } else if (habito.progresso < habito.meta && jaConcluido) {
+            alternarHabito(id);
+        }
+        salvarDB();
+        renderizarHome();
+    }
+
+    function atualizarInterfaceStatus() {
+        if(document.getElementById('stat-nivel')) document.getElementById('stat-nivel').innerText = db.usuario.nivel;
+        if(document.getElementById('stat-xp')) document.getElementById('stat-xp').innerText = db.usuario.xp;
+        if(document.getElementById('stat-moedas')) document.getElementById('stat-moedas').innerText = db.usuario.moedas;
+    }
+
+    function calcularProgressoDiario() {
+        const hoje = getHoje();
+        const total = db.habitos.filter(h => h.freq === 'fixo').length || db.habitos.length;
+        const concluidos = db.registros[hoje].length;
+        const porcentagem = total > 0 ? Math.round((concluidos / total) * 100) : 0;
+
+        const barra = document.getElementById('barra-progresso-hoje');
+        const texto = document.getElementById('texto-progresso-hoje');
+        
+        if (barra) barra.style.width = Math.min(porcentagem, 100) + '%';
+        if (texto) texto.innerText = Math.min(porcentagem, 100) + '%';
+
+        if (porcentagem >= 100 && !db.conquistas.includes('perfeicao_' + hoje)) {
+            db.conquistas.push('perfeicao_' + hoje);
+            db.usuario.moedas += 100;
+            alert("🏛️ DIA PERFEITO! +100 moedas de honra.");
+            salvarDB();
+            atualizarInterfaceStatus();
+        }
+    }
+
+    function notificarLevelUp(nivel) {
+        const overlay = document.createElement('div');
+        overlay.style = `position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--cor-ouro); text-align:center; padding:20px; border: 4px solid var(--cor-ouro);`;
+        overlay.innerHTML = `
+            <h1 style="font-size:2.5rem; color:gold; text-shadow: 0 0 20px var(--cor-ouro);">⚡ EVOLUÇÃO ⚡</h1>
+            <p style="letter-spacing:2px;">VOCÊ ATINGIU O NÍVEL ${nivel}</p>
+            <div style="font-size:5rem; margin:20px;">🛡️</div>
+            <button class="btn-guerreiro" onclick="this.parentElement.remove()">HONRAR PROGRESSO</button>
+        `;
+        document.body.appendChild(overlay);
+    }
+
+    function vibrar(ms) {
+        if (navigator.vibrate) navigator.vibrate(ms);
+    }
+
+    function verificarLevelUp() {
+        let xpParaProxNivel = db.usuario.nivel * 200;
+        if (db.usuario.xp >= xpParaProxNivel) {
+            db.usuario.nivel++;
+            db.usuario.xp -= xpParaProxNivel;
+            notificarLevelUp(db.usuario.nivel);
+        }
+    }
+</script>
+<script>
+    /* ============================================================
+       SISTEMA DE SEGURANÇA: BACKUP EM JSON (PARTE 5 - BLINDADA)
+       ============================================================ */
+
+    function gerarAssinatura(texto) {
+        let hash = 0;
+        for (let i = 0; i < texto.length; i++) {
+            hash = ((hash << 5) - hash) + texto.charCodeAt(i);
+            hash |= 0; 
+        }
+        return Math.abs(hash).toString(36);
+    }
+
+    function exportarDadosTexto() {
+        const campo = document.getElementById('input-backup-texto');
+        try {
+            const dadosParaExportar = { 
+                ...db,
+                idInstalacao: db.idInstalacao,
+                dataInstalacao: db.dataInstalacao
+            };
+            
+            const dadosPuros = JSON.stringify(dadosParaExportar);
+            const pacote = {
+                payload: dadosPuros,
+                v: "2.0-Elite",
+                sig: gerarAssinatura(dadosPuros)
+            };
+            
+            const jsonFinal = JSON.stringify(pacote);
+            
+            // Exibe o código diretamente na caixa preta
+            if (campo) {
+                campo.value = jsonFinal;
+                campo.select();
+            }
+
+            navigator.clipboard.writeText(jsonFinal).then(() => {
+                alert("CÓDIGO DE HONRA GERADO NA CAIXA PRETA!");
+            });
+        } catch (e) {
+            alert("Erro ao forjar backup.");
+        }
+    }
+
+    function importarDadosTexto() {
+        // Lógica Corrigida: Lê direto da caixa preta (textarea)
+        const campo = document.getElementById('input-backup-texto');
+        
+        if (!campo || !campo.value.trim()) {
+            alert("ERRO: Cole o código na caixa preta antes de restaurar.");
+            return;
+        }
+
+        const codigo = campo.value.trim();
+
+        try {
+            const pacote = JSON.parse(codigo);
+
+            const assinaturaReal = gerarAssinatura(pacote.payload);
+            if (pacote.sig !== assinaturaReal) {
+                alert("ERRO DE INTEGRIDADE: Backup corrompido ou alterado.");
+                return;
+            }
+
+            const novosDados = JSON.parse(pacote.payload);
+            
+            // Preserva o ID de instalação do dispositivo para evitar erros de licença
+            const idAtual = db.idInstalacao;
+            db = novosDados;
+            db.idInstalacao = idAtual; 
+
+            salvarDB();
+
+            alert("PROGRESSO RESTAURADO!");
+
+            if (typeof verificarBloqueio === "function" && verificarBloqueio()) {
+                alert("AVISO: Conta com período de teste expirado.");
+            }
+
+            location.reload();
+        } catch (e) {
+            alert("Texto inválido! Cole o código JSON completo na caixa preta.");
+        }
+    }
+
+    /* ============================================================
+       GERENCIAMENTO DE HÁBITOS (CRUD - FOCO EM DISCIPLINA FIXA)
+       ============================================================ */
+    
+    function renderizarCRUD() {
+        const container = document.getElementById('lista-crud-habitos');
+        if (!container) return;
+        container.innerHTML = '';
+
+        db.habitos.forEach(h => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style = "border-left: 3px solid var(--cor-ouro); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;";
+            card.innerHTML = `
+                <div>
+                    <b class="gold">${h.nome}</b> <small>(${h.cat})</small>
+                    <div class="small" style="color: #888; font-style: italic;">${h.desc || 'Sem descrição'}</div>
+                    <div class="small">🔄 Todo dia | 💪 XP: ${h.xp}</div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="excluirHabito(${h.id})" style="background:none; border:none; color:var(--cor-perigo); cursor:pointer;"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function abrirModalHabito() {
+        const nome = prompt("Nome do Hábito:");
+        if (!nome) return;
+
+        const descInput = prompt("Descrição/Lembrete:");
+        const catOpcao = prompt("Categoria:\n1-Mente, 2-Corpo, 3-Evolução, 4-Disciplina", "1");
+        const categoriasMap = { "1": "Mente", "2": "Corpo", "3": "Evolução", "4": "Disciplina" };
+        const cat = categoriasMap[catOpcao] || "Mente";
+        
+        const diff = parseInt(prompt("Dificuldade (1-3):", "2")) || 2;
+        
+        const novoHabito = {
+            id: Date.now(),
+            nome: nome,
+            desc: descInput || "Hábito personalizado",
+            tipo: "check",
+            meta: 1,
+            progresso: 0,
+            cat: cat,
+            diff: diff,
+            freq: 'fixo',
+            xp: diff * 20
+        };
+
+        db.habitos.push(novoHabito);
+        salvarDB();
+        renderizarCRUD();
+        if (typeof renderizarHome === "function") renderizarHome();
+    }
+
+    function excluirHabito(id) {
+        if (confirm("Deseja remover este hábito permanentemente?")) {
+            db.habitos = db.habitos.filter(h => h.id !== id);
+            salvarDB();
+            renderizarCRUD();
+            if (typeof renderizarHome === "function") renderizarHome();
+        }
+    }
+
+    /* ============================================================
+       SISTEMA DE CALENDÁRIO E TAREFAS
+       ============================================================ */
+    
+    let dataCalendario = new Date();
+    let dataSelecionadaBatalha = (typeof getHoje === "function") ? getHoje() : formatarDataParaID(new Date()); 
+
+    function inicializarCalendario() {
+        const grade = document.getElementById('cal-grade');
+        const titulo = document.getElementById('cal-titulo');
+        if(!grade || !titulo) return;
+        grade.innerHTML = '';
+
+        const nomesDias = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+        nomesDias.forEach(d => grade.innerHTML += `<b style="font-size:0.7rem; color:var(--cor-ouro)">${d}</b>`);
+
+        const ano = dataCalendario.getFullYear();
+        const mes = dataCalendario.getMonth();
+        titulo.innerText = `${new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(dataCalendario)} ${ano}`;
+
+        const primeiroDiaMes = new Date(ano, mes, 1).getDay();
+        const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+
+        for (let i = 0; i < primeiroDiaMes; i++) grade.innerHTML += '<div></div>';
+
+        for (let dia = 1; dia <= diasNoMes; dia++) {
+            const dataStr = formatarDataParaID(new Date(ano, mes, dia));
+            const hoje = (typeof getHoje === "function" ? getHoje() : formatarDataParaID(new Date())) === dataStr;
+            const selecionada = dataSelecionadaBatalha === dataStr;
+
+            const tarefasDoDia = db.tarefas.filter(t => t.data === dataStr || t.fixa);
+            const concluidas = db.progressoTarefas[dataStr] || [];
+            const tudoPronto = tarefasDoDia.length > 0 && tarefasDoDia.every(t => concluidas.includes(t.id));
+
+            grade.innerHTML += `
+                <div onclick="selecionarDiaBatalha('${dataStr}')" 
+                     style="padding: 10px 5px; border-radius: 5px; cursor: pointer; transition: 0.3s;
+                            ${hoje ? 'border: 1px solid var(--cor-ouro);' : ''}
+                            ${selecionada ? 'background: var(--cor-ouro); color: #000; font-weight: bold;' : ''}
+                            ${tudoPronto && !selecionada ? 'background: rgba(46,125,50,0.3);' : ''}">
+                    ${dia}
+                </div>`;
+        }
+        renderizarTarefasBatalha();
+    }
+
+    function mudarMes(direcao) {
+        dataCalendario.setMonth(dataCalendario.getMonth() + direcao);
+        inicializarCalendario();
+    }
+
+    function selecionarDiaBatalha(dataStr) {
+        dataSelecionadaBatalha = dataStr;
+        inicializarCalendario(); 
+    }
+
+    function abrirModalNovaTarefa() {
+        const nome = prompt("Descreva a nova Tarefa:");
+        if (!nome) return;
+
+        const turnoOpcao = prompt("Qual o turno?\n1 - Manhã\n2 - Tarde\n3 - Noite", "1");
+        const turnosMap = { "1": "Manhã", "2": "Tarde", "3": "Noite" };
+        const turno = turnosMap[turnoOpcao] || "Manhã";
+
+        const ehFixa = confirm("Esta tarefa é FIXA?");
+
+        db.tarefas.push({
+            id: Date.now(),
+            nome: nome,
+            turno: turno,
+            fixa: ehFixa,
+            data: ehFixa ? null : dataSelecionadaBatalha
+        });
+        
+        salvarDB();
+        renderizarTarefasBatalha();
+        inicializarCalendario();
+    }
+
+    function renderizarTarefasBatalha() {
+        const lista = document.getElementById('lista-tarefas-batalha');
+        const tituloData = document.getElementById('data-selecionada-titulo');
+        const circulo = document.getElementById('circulo-progresso-tarefas');
+        const textoPct = document.getElementById('texto-progresso-tarefas');
+        
+        if (!lista) return;
+
+        const dataFormatada = dataSelecionadaBatalha.split('-').reverse().join('/');
+        tituloData.innerHTML = `TAREFAS DE: ${dataFormatada}`;
+        lista.innerHTML = '';
+
+        const tarefasExibir = db.tarefas.filter(t => t.fixa || t.data === dataSelecionadaBatalha);
+        
+        if (tarefasExibir.length === 0) {
+            lista.innerHTML = '<p class="small center italic" style="padding:20px;">Sem ordens para hoje.</p>';
+            if (circulo) circulo.style.strokeDasharray = "0, 100";
+            if (textoPct) textoPct.innerText = "0%";
+            return;
+        }
+
+        let done = 0;
+        const concluidasIds = db.progressoTarefas[dataSelecionadaBatalha] || [];
+
+        tarefasExibir.forEach(t => {
+            const isDone = concluidasIds.includes(t.id);
+            if (isDone) done++;
+
+            const item = document.createElement('div');
+            item.className = 'card';
+            item.style = `padding: 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; border: 1px solid ${isDone ? 'var(--cor-sucesso)' : '#444'}`;
+            
+            item.innerHTML = `
+                <div onclick="alternarTarefa(${t.id})" style="cursor:pointer; color: ${isDone ? 'var(--cor-sucesso)' : '#555'}">
+                    <i class="fas ${isDone ? 'fa-check-square' : 'fa-square'}"></i>
+                </div>
+                <div style="flex:1" onclick="alternarTarefa(${t.id})">
+                    <div style="font-size:0.8rem; font-weight:bold; ${isDone ? 'text-decoration: line-through; opacity: 0.6;' : ''}">${t.nome}</div>
+                    <div style="font-size:0.6rem; color: var(--cor-ouro);">${t.turno} ${t.fixa ? '• 🔄 Fixa' : ''}</div>
+                </div>
+                <button onclick="removerTarefaBatalha(${t.id})" style="background:none; border:none; color:#666;"><i class="fas fa-times"></i></button>
+            `;
+            lista.appendChild(item);
+        });
+
+        const pct = Math.round((done / tarefasExibir.length) * 100);
+        if (circulo) circulo.style.strokeDasharray = `${pct}, 100`;
+        if (textoPct) textoPct.innerText = pct + "%";
+    }
+
+    function alternarTarefa(id) {
+        if (!db.progressoTarefas[dataSelecionadaBatalha]) db.progressoTarefas[dataSelecionadaBatalha] = [];
+        const index = db.progressoTarefas[dataSelecionadaBatalha].indexOf(id);
+        
+        if (index > -1) {
+            db.progressoTarefas[dataSelecionadaBatalha].splice(index, 1);
+        } else {
+            db.progressoTarefas[dataSelecionadaBatalha].push(id);
+            db.usuario.xp += 10;
+        }
+        
+        salvarDB();
+        renderizarTarefasBatalha();
+        inicializarCalendario();
+        if (typeof verificarLevelUp === "function") verificarLevelUp();
+        if (typeof atualizarInterfaceStatus === "function") atualizarInterfaceStatus();
+    }
+
+    function removerTarefaBatalha(id) {
+        if (confirm("Deseja remover esta tarefa?")) {
+            db.tarefas = db.tarefas.filter(t => t.id !== id);
+            salvarDB();
+            renderizarTarefasBatalha();
+            inicializarCalendario();
+        }
+    }
+    /* ============================================================
+       SISTEMA ANTI-VÍCIOS (DOMÍNIO PRÓPRIO) - PARTE 5 & 6
+       ============================================================ */
+    
+    const frasesMotivacionais = [
+        "A dor é temporária, a glória de vencer a si mesmo é eterna.",
+        "O escravo segue seus impulsos; o rei governa sua própria mente.",
+        "Sua vontade deve ser como o aço: forjada no fogo e temperada no gelo.",
+        "Não negocie com sua fraqueza. Esmague-a.",
+        "Onde há disciplina, há liberdade real.",
+        "O conforto é o assassino do progresso. Levante-se!",
+        "Lembre-se do motivo pelo qual você começou. Honre sua palavra.",
+        "Um guerreiro não evita a batalha, ele domina o campo.",
+        "Sua mente é sua fortaleza. Não deixe vícios invadirem os portões.",
+        "A excelência nasce do que você faz quando ninguém está olhando.",
+        "Vencer uma vez é sorte. Vencer todos os dias é hábito.",
+        "O o bstáculo não bloqueia o caminho; ele É o caminho.",
+        "Seja o mestre do seu destino, não o servo dos seus desejos.",
+        "O suor de hoje é a armadura de amanhã.",
+        "Grandes impérios não caem por ataques externos, mas por fraqueza interna.",
+        "A disciplina é a ponte entre seus objetivos e suas conquistas.",
+        "Se você cansar, aprenda a descansar, não a desistir.",
+        "A vida não fica mais fácil, você que fica mais forte.",
+        "O que não te desafia, não te transforma.",
+        "O gladiador que treina na paz, não sangra na guerra.",
+        "Mantenha a calma. A raiva é uma conselheira traiçoeira.",
+        "A paciência é a virtude dos deuses.",
+        "Domine sua manhã e você dominará seu dia.",
+        "Cada 'no' para o vício é um 'sim' para a sua grandeza.",
+        "O destino favorece os audazes.",
+        "Não espere por motivação. Construa disciplina.",
+        "A procrastinação é o ladrão do tempo e da alma.",
+        "Sua vida é o resultado das suas escolhas, não das suas desculpas.",
+        "A força não vem da capacidade física, mas de uma vontade indomável.",
+        "Seja como a rocha: as ondas batem, mas você permanece firme.",
+        "O foco é a sua arma mais poderosa. Mire com precisão.",
+        "O fracasso é apenas um mestre disfarçado.",
+        "Honre seus ancestrais com sua conduta impecável.",
+        "Um passo de cada vez, mas nunca para trás.",
+        "O silêncio é, muitas vezes, a resposta mais sábia.",
+        "Não reclame do que você permite.",
+        "A sorte é o encontro da preparação com a oportunidade.",
+        "Sua palavra é seu contrato sagrado.",
+        "A verdadeira riqueza é o controle sobre si mesmo.",
+        "O medo é um mentiroso. Não dê ouvidos a ele.",
+        "Transforme sua dor em combustível para a sua evolução.",
+        "Você é o arquiteto da sua própria alma.",
+        "O caráter é o que resta quando o prazer acaba.",
+        "A persistência vence o talento quando o talento não persiste.",
+        "Não olhe para os lados. Olhe para o topo.",
+        "A vitória sobre si mesmo é a maior de todas as vitórias.",
+        "Mantenha-se fiel ao seu propósito, mesmo na tempestade.",
+        "O tempo é o recurso mais escasso. Use-o com sabedoria.",
+        "O arrependimento pesa toneladas; a disciplina pesa gramas.",
+        "Você nasceu para ser um imperador de sua própria vida. Aja como tal."
+    ];
+
+    function renderizarVicios() {
+        const container = document.getElementById('vicios-lista');
+        if(!container) return;
+        container.innerHTML = '';
+
+        db.vicios.forEach(v => {
+            const dataInicio = new Date(v.ultimaRecaida);
+            const hoje = new Date();
+            const diferencaTempo = hoje - dataInicio;
+            const diasCalculados = Math.floor(diferencaTempo / (1000 * 60 * 60 * 24));
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:start;">
+                    <h3 class="gold">${v.nome}</h3>
+                    <button onclick="excluirVicio(${v.id})" style="background:none; border:none; color:var(--cor-perigo); cursor:pointer;"><i class="fas fa-trash"></i></button>
+                </div>
+                <p style="font-size:1.5rem; font-weight:900;">${diasCalculados} Dias Limpos</p>
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <button class="btn-guerreiro" onclick="recaida(${v.id})" style="background:var(--cor-perigo); box-shadow: 0 4px 0 #800;">FRAQUEJEI</button>
+                    <button class="btn-guerreiro" onclick="estouComVontade()" style="background:var(--cor-sucesso); box-shadow: 0 4px 0 #1B5E20;">ESTOU COM VONTADE</button>
+                </div>
+                <p class="small" style="margin-top:10px; font-size:0.6rem; opacity:0.5;">Focado desde: ${dataInicio.toLocaleDateString('pt-BR')}</p>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function excluirVicio(id) {
+        if (confirm("Deseja remover este registro?")) {
+            db.vicios = db.vicios.filter(v => v.id !== id);
+            salvarDB();
+            renderizarVicios();
+        }
+    }
+
+    function abrirModalVicio() {
+        if (db.vicios.length >= 3 && !db.usuario.isPro) {
+            alert("⚠️ LIMITE ATINGIDO!\nO domínio de múltiplas fraquezas é uma arte da Elite. Torne-se PRO para registrar mais de 3 vícios.");
+            return;
+        }
+
+        const nomeVicio = prompt("Qual vício você deseja derrotar?");
+        if (!nomeVicio) return;
+
+        db.vicios.push({
+            id: Date.now(),
+            nome: nomeVicio,
+            ultimaRecaida: new Date().toISOString()
+        });
+        salvarDB();
+        renderizarVicios();
+        alert("Contagem iniciada. Força, Guerreiro!");
+    }
+
+    function estouComVontade() {
+        const frase = frasesMotivacionais[Math.floor(Math.random() * frasesMotivacionais.length)];
+        const acoes = [
+            "Beba 2 copos de água bem gelada.",
+            "Faça 20 flexões rápidas.",
+            "Respire pelo nariz em 4s e solte pela boca em 8s.",
+            "Mude de ambiente imediatamente.",
+            "Lave o rosto com água gelada.",
+            "Faça 1 minuto de prancha abdominal.",
+            "Escreva 3 motivos racionais para parar.",
+            "Feche os olhos e imagine o arrependimento pós-erro.",
+            "Tome um banho gelado agora.",
+            "Force um bocejo longo várias vezes.",
+            "Repita: 'Eu sou maior que este impulso'."
+        ];
+        const acao = acoes[Math.floor(Math.random() * acoes.length)];
+        alert(`🏛️ MESTRE DIZ:\n\n"${frase}"\n\n⚡ AÇÃO: ${acao}`);
+    }
+
+    function recaida(id) {
+        if (confirm("O contador voltará a zero. Você assume essa falha?")) {
+            const vicio = db.vicios.find(v => v.id === id);
+            vicio.ultimaRecaida = new Date().toISOString();
+            salvarDB();
+            renderizarVicios();
+            alert("Levante-se. O passado morreu, o agora é sua nova chance.");
+        }
+    }
+
+    /* ============================================================
+       CHAVE MESTRA: VALIDAÇÃO DIRETA VIA CAMPOS DE INPUT
+       ============================================================ */
+
+    function validarChaveDireta() {
+        // Tenta capturar a chave de qualquer um dos inputs (Configuração ou Bloqueio)
+        const inputConfig = document.getElementById('input-chave-config');
+        const inputBloqueio = document.getElementById('input-chave-ativacao');
+        
+        const chaveInserida = (inputConfig && inputConfig.value) || (inputBloqueio && inputBloqueio.value);
+
+        if (!chaveInserida) {
+            alert("Por favor, insira sua chave de 4 dígitos.");
+            return;
+        }
+
+        // FÓRMULA MATEMÁTICA DE VALIDAÇÃO (Baseada no ID único do dispositivo)
+        const calculoCorreto = Math.floor((db.usuario.idInstalacao * 17) + 2026 + (db.usuario.idInstalacao / 2));
+
+        if (parseInt(chaveInserida) === calculoCorreto) {
+            db.usuario.isPro = true;
+            salvarDB();
+            
+            alert("⚔️ ACESSO DE ELITE LIBERADO!\nSua honra foi validada. O sistema está 100% desbloqueado.");
+            location.reload(); // Recarrega para aplicar todas as mudanças
+        } else {
+            alert("❌ CHAVE INCORRETA!\nVerifique se o seu ID de Instalação condiz com a chave fornecida.");
+        }
+    }
+
+    // Função auxiliar para facilitar a cópia do ID
+    function copiarID() {
+        const idTexto = db.usuario.idInstalacao;
+        navigator.clipboard.writeText(idTexto).then(() => {
+            alert("ID Copiado: " + idTexto + "\nUse este ID para gerar sua chave.");
+        });
+    }
+</script>
+<script>
+  /* ============================================================
+       SISTEMA DE DESAFIOS (EVOLUÇÃO MULTI-HABITOS) - SOFTWARE FERREIRA
+       ============================================================ */
+    
+    function atualizarProgressoDesafios() {
+        if (!db.desafios || !db.registros) return;
+
+        // Mapeamento de Desafio ID -> Lista de IDs de Hábitos necessários
+        const mapaCombos = { 
+            7:  [907, 908], 
+            20: [920, 921, 922], 
+            40: [940, 941], 
+            60: [960, 961, 962], 
+            90: [990, 991, 992, 993] 
+        };
+
+        db.desafios.forEach(desafio => {
+            if (desafio.ativo) {
+                const habitosRequeridos = mapaCombos[desafio.id];
+                let diasCompletos = 0;
+
+                // Para cada dia no histórico, verifica se TODOS os hábitos do combo foram feitos
+                Object.keys(db.registros).forEach(data => {
+                    const feitosNoDia = db.registros[data] || [];
+                    const completouCombo = habitosRequeridos.every(id => feitosNoDia.includes(id));
+                    
+                    if (completouCombo) {
+                        diasCompletos++;
+                    }
+                });
+
+                desafio.progresso = Math.min(diasCompletos, desafio.dias);
+
+                if (desafio.progresso >= desafio.dias && !desafio.finalizado) {
+                    desafio.finalizado = true;
+                    db.usuario.moedas = (db.usuario.moedas || 0) + desafio.recompensa;
+                    alert(`🏆 DESAFIO CONCLUÍDO! Você forjou sua disciplina no ${desafio.nome}. +${desafio.recompensa} moedas.`);
+                }
+            }
+        });
+        salvarDB();
+    }
+
+    function ativarDesafioSistemico(id) {
+        const desafio = db.desafios.find(d => d.id === id);
+        if (id > 7 && !db.usuario.isPro) {
+            alert("Acesso restrito à Elite PRO.");
+            return;
+        }
+
+        if(!confirm(`Iniciar ${desafio.nome}? Isso adicionará múltiplos hábitos à sua rotina. Aceita o fardo?`)) return;
+
+        // Definição dos Combos de Evolução Real
+        const combos = {
+            7: [
+                { id: 907, nome: "🧊 Banho Gelado (Acordar)", cat: "Corpo", tipo: "check", freq: "fixo", xp: 30 },
+                { id: 908, nome: "☀️ Exposição Solar (10min)", cat: "Corpo", tipo: "check", freq: "fixo", xp: 20 }
+            ],
+            20: [
+                { id: 920, nome: "🚫 Zero Açúcar e Doces", cat: "Corpo", tipo: "check", freq: "fixo", xp: 50 },
+                { id: 921, nome: "🥗 Refeição Limpa", cat: "Corpo", tipo: "check", freq: "fixo", xp: 40 },
+                { id: 922, nome: "💧 3L de Água", cat: "Corpo", tipo: "check", freq: "fixo", xp: 30 }
+            ],
+            40: [
+                { id: 940, nome: "📖 Leitura Estoica (15min)", cat: "Mente", tipo: "check", freq: "fixo", xp: 60 },
+                { id: 941, nome: "📵 Sem Telas ao Acordar (1h)", cat: "Mente", tipo: "check", freq: "fixo", xp: 60 }
+            ],
+            60: [
+                { id: 960, nome: "✍️ Escrita de Diário", cat: "Mente", tipo: "check", freq: "fixo", xp: 80 },
+                { id: 961, nome: "🧘 Meditação/Silêncio (10min)", cat: "Mente", tipo: "check", freq: "fixo", xp: 70 },
+                { id: 962, nome: "🏃 Treino Intenso (Físico)", cat: "Corpo", tipo: "check", freq: "fixo", xp: 100 }
+            ],
+            90: [
+                { id: 990, nome: "🧠 Jejum de Dopamina", cat: "Disciplina", tipo: "check", freq: "fixo", xp: 150 },
+                { id: 991, nome: "💰 Estudo Financeiro/Trabalho", cat: "Mente", tipo: "check", freq: "fixo", xp: 120 },
+                { id: 992, nome: "🌓 Sono Regular (7-8h)", cat: "Corpo", tipo: "check", freq: "fixo", xp: 100 },
+                { id: 993, nome: "📵 Redução Social Media", cat: "Mente", tipo: "check", freq: "fixo", xp: 150 }
+            ]
+        };
+
+        desafio.ativo = true;
+        desafio.progresso = 0;
+        desafio.finalizado = false;
+
+        combos[id].forEach(habito => {
+            if (!db.habitos.find(h => h.id === habito.id)) {
+                db.habitos.push(habito);
+            }
+        });
+
+        salvarDB();
+        renderizarDesafios();
+        if (typeof navegar === "function") navegar('home');
+    }
+
+    function abandonarDesafio(id) {
+        if(!confirm("⚠️ O progresso será deletado e os hábitos removidos. Vai desistir mesmo?")) return;
+
+        const desafio = db.desafios.find(d => d.id === id);
+        desafio.ativo = false;
+        desafio.progresso = 0;
+
+        const mapaCombos = { 7: [907, 908], 20: [920, 921, 922], 40: [940, 941], 60: [960, 961, 962], 90: [990, 991, 992, 993] };
+        const idsRemover = mapaCombos[id];
+        
+        db.habitos = db.habitos.filter(h => !idsRemover.includes(h.id));
+
+        salvarDB();
+        renderizarDesafios();
+    }
+
+    function renderizarDesafios() {
+        const container = document.getElementById('container-desafios');
+        if (!container) return;
+        
+        atualizarProgressoDesafios();
+        container.innerHTML = '';
+
+        db.desafios.forEach(d => {
+            const porcentagem = Math.round((d.progresso / d.dias) * 100);
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style = `border: 1px solid ${d.ativo ? 'var(--cor-ouro)' : '#444'}; margin-bottom: 15px; padding: 15px;`;
+            
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 class="gold" style="margin:0;">${d.nome}</h3>
+                    <span class="small">${d.progresso}/${d.dias} Dias</span>
+                </div>
+                <div class="progress-outer" style="background:#222; height:8px; border-radius:4px; margin:12px 0; overflow:hidden;">
+                    <div class="progress-inner" style="width:${porcentagem}%; background:var(--cor-ouro); height:100%; transition: 0.5s;"></div>
+                </div>
+                <p class="small" style="color:#888; font-size:0.65rem; margin-bottom:10px;">
+                    ${d.ativo ? '⚠️ Requer conclusão de TODOS os hábitos do combo diariamente.' : 'Aceite para ver os novos hábitos.'}
+                </p>
+                ${!d.ativo 
+                    ? `<button class="btn-guerreiro" onclick="ativarDesafioSistemico(${d.id})" style="width:100%;">ACEITAR MISSÃO</button>`
+                    : `<button class="btn-guerreiro" onclick="abandonarDesafio(${d.id})" style="background:#331111; border-color:#552222; width:100%; font-size:0.6rem;">ABANDONAR</button>`
+                }
+            `;
+            container.appendChild(card);
+        });
+    }
+    /* ============================================================
+       MURALHA DE CONHECIMENTO (E-BOOKS & CONTEÚDO ELITE)
+       ============================================================ */
+
+    function renderizarPremium() {
+        const container = document.getElementById('lista-ebooks');
+        if (!container) return;
+        
+        container.innerHTML = `
+            <div class="card" style="border: 1px solid var(--cor-ouro); background: rgba(212,175,55,0.05); margin-bottom:15px; padding: 15px;">
+                <h4 class="gold" style="margin-top:0;"><i class="fas fa-scroll"></i> MANUAL DO GUERREIRO</h4>
+                <p class="small" style="color: #ccc;">Guia oficial de operações e conduta da Software Ferreira.</p>
+                <button onclick="tentarAbrirEbook('manual')" class="btn-guerreiro" style="font-size:0.7rem; margin-top:10px; width:100%;">ABRIR MANUAL (PDF)</button>
+            </div>
+            <div class="card" style="border: 1px solid gold; background: rgba(212,175,55,0.02); margin-bottom:15px; padding: 15px;">
+                <h4 class="gold" style="margin-top:0;"><i class="fas fa-brain"></i> MENTALIDADE DE FERRO</h4>
+                <p class="small" style="color: #ccc;">Domine suas emoções e destrua a procrastinação. (Inclui Audiobook 🎧)</p>
+                <button onclick="tentarAbrirEbook('mentalidade')" class="btn-guerreiro" style="font-size:0.7rem; margin-top:10px; width:100%;">ACESSAR CONTEÚDO</button>
+            </div>
+            <div class="card" style="border: 1px solid gold; background: rgba(212,175,55,0.02); margin-bottom:15px; padding: 15px;">
+                <h4 class="gold" style="margin-top:0;"><i class="fas fa-dumbbell"></i> GUIA DE CALISTENIA</h4>
+                <p class="small" style="color: #ccc;">Treino de elite utilizando apenas o peso do corpo e disciplina.</p>
+                <button onclick="tentarAbrirEbook('calistenia')" class="btn-guerreiro" style="font-size:0.7rem; margin-top:10px; width:100%;">ABRIR GUIA DE TREINO</button>
+            </div>
+        `;
+    }
+
+    function tentarAbrirEbook(tipo) {
+        // O manual é livre, os outros pedem PRO
+        if (tipo !== 'manual' && !db.usuario.isPro) {
+            alert("ACESSO NEGADO. Esta sabedoria é reservada para membros da Elite (PRO).");
+            return;
+        }
+        
+        const links = {
+            // LINK NOVO DO MANUAL ATUALIZADO ABAIXO:
+            manual: "https://drive.google.com/file/d/1N03AdA0S75qBKnAmrjA5lYJakX1saQvH/view?usp=drivesdk",
+            mentalidade: "https://drive.google.com/file/d/1XCZ_Ys5LMd7LEnP9_qJOaH6YOhF5LWRZ/view?usp=drivesdk",
+            calistenia: "https://drive.google.com/file/d/1XWA__wJzWEuSL6EI3woJ9Jo073ffAqMM/view?usp=drivesdk"
+        };
+
+        window.open(links[tipo], '_blank');
+    }
+
+    /* ============================================================
+       INICIALIZAÇÃO GLOBAL E SINCRONIZAÇÃO (ONLOAD)
+       ============================================================ */
+
+    window.onload = function() {
+        // 1. Integridade do Banco de Dados
+        if (!db.valoresGuerreiro) db.valoresGuerreiro = [];
+        if (!db.config) db.config = { ultimoBackup: null, tema: 'dark' };
+        
+        // Inicializa os desafios caso não existam
+        if (!db.desafios || db.desafios.length === 0) {
+            db.desafios = [
+                { id: 7, nome: "BATISMO DE GELO", dias: 7, recompensa: 100, ativo: false, progresso: 0, finalizado: false },
+                { id: 20, nome: "PROTOCOLO SAÚDE", dias: 20, recompensa: 300, ativo: false, progresso: 0, finalizado: false },
+                { id: 40, nome: "FOCO FILOSÓFICO", dias: 40, recompensa: 600, ativo: false, progresso: 0, finalizado: false },
+                { id: 60, nome: "DIÁRIO DE GUERRA", dias: 60, recompensa: 1000, ativo: false, progresso: 0, finalizado: false },
+                { id: 90, nome: "FORJA ESTOICA", dias: 90, recompensa: 2500, ativo: false, progresso: 0, finalizado: false }
+            ];
+        }
+
+        // 2. Aplicação do Status PRO na Interface
+        if(db.usuario && db.usuario.isPro) {
+            const muralha = document.getElementById('muralha-pro');
+            const tabs = document.querySelector('.bottom-tabs');
+            if (muralha) muralha.style.display = 'none';
+            if (tabs) tabs.style.display = 'flex';
+        }
+
+        // 3. Execução de Motores de Renderização
+        if (typeof validarSessao === "function") validarSessao();
+        if (typeof renderizarHome === "function") renderizarHome();
+        if (typeof atualizarFrase === "function") atualizarFrase(); 
+        
+        // Sincroniza o progresso dos desafios baseando-se no histórico
+        if (typeof atualizarProgressoDesafios === "function") atualizarProgressoDesafios(); 
+
+        console.log("SISTEMA FERREIRA: MANUAL ATUALIZADO E SISTEMA OPERACIONAL.");
+    };
+</script>
+</body>
+</html>
