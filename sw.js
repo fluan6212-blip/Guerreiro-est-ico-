@@ -1,5 +1,5 @@
 // Este é o Escudo Offline do Software Ferreira
-const CACHE_NAME = 'ferreira-V2';
+const CACHE_NAME = 'ferreira-v2';
 const assets = [
   './',
   './index.html',
