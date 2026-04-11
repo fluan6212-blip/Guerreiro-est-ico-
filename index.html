@@ -665,10 +665,14 @@
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('Escudo Offline Ativado!', reg))
+                .then(reg => {
+                    console.log('Escudo Offline Ativado!');
+                    reg.update(); // <--- FORÇA A BUSCA POR ATUALIZAÇÃO NO GITHUB
+                })
                 .catch(err => console.log('Erro ao ativar escudo:', err));
         });
     }
+
 
     /* ============================================================
        2. BANCO DE DADOS - ESTRUTURA COMPLETA (SOFTWARE FERREIRA)
@@ -990,6 +994,7 @@
     }
 
     validarSessao();
+    
 </script>
 <script>
     /* ============================================================
