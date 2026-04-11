@@ -245,7 +245,7 @@
             font-size: 1.1rem;
         }
 
-        /* NAVEGAÇÃO INFERIOR */
+        /* NAVEGAÇÃO INFERIOR E MENU EXPANSÍVEL */
         nav#bottom-tabs {
             position: fixed;
             bottom: 0;
@@ -253,9 +253,11 @@
             background: var(--bg-card);
             display: flex;
             justify-content: space-around;
+            align-items: center;
             padding: 8px 2px;
             border-top: 2px solid var(--cor-ouro);
             z-index: 2000;
+            height: 70px;
         }
 
         .tab-item {
@@ -268,10 +270,78 @@
             gap: 3px;
             flex: 1;
             text-align: center;
+            transition: var(--transition);
         }
 
         .tab-item.active { color: var(--cor-ouro); }
         .tab-item i { font-size: 1.15rem; }
+
+        /* SISTEMA DO BOTÃO CENTRAL (+) - ATUALIZADO PARA 6 BOTÕES */
+        .menu-expansivel {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2100;
+        }
+
+        .btn-principal {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--cor-ouro);
+            border: 2px solid var(--cor-preto-profundo);
+            color: var(--cor-preto-profundo);
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transition: var(--transition);
+            z-index: 2102;
+        }
+
+        .btn-subir {
+            position: absolute;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--cor-pedra);
+            border: 1px solid var(--cor-ouro);
+            color: var(--cor-ouro);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            opacity: 0;
+            bottom: 10px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            z-index: 2101;
+        }
+
+        /* CALIBRAÇÃO DO LEQUE DE 6 BOTÕES */
+        .btn-1 { --x: -80px; --y: -20px; --delay: 0.05s; } /* Gráfico */
+        .btn-2 { --x: -70px; --y: -75px; --delay: 0.1s; }  /* Diário */
+        .btn-3 { --x: -25px; --y: -110px; --delay: 0.15s; } /* Proteína */
+        .btn-4 { --x: 25px;  --y: -110px; --delay: 0.2s; }  /* Financeiro (Novo) */
+        .btn-5 { --x: 70px;  --y: -75px; --delay: 0.25s; }  /* Metas (Novo) */
+        .btn-6 { --x: 80px;  --y: -20px; --delay: 0.3s; }   /* Treino (Novo) */
+
+        .menu-expansivel.active .btn-subir {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(var(--x), var(--y));
+            transition-delay: var(--delay);
+        }
+
+        .menu-expansivel.active .btn-principal {
+            transform: rotate(45deg);
+            background: var(--cor-perigo);
+            color: white;
+        }
 
         /* PROGRESSO */
         .progress-outer {
@@ -382,6 +452,13 @@
                 <i class="fas fa-medal"></i> Novo Valor Inegociável
             </button>
         </section>
+
+        <section id="view-grafico" class="view-section"></section>
+        <section id="view-diario" class="view-section"></section>
+        <section id="view-proteina" class="view-section"></section>
+        <section id="view-financas" class="view-section"></section>
+        <section id="view-metas" class="view-section"></section>
+        <section id="view-treino" class="view-section"></section>
 
         <section id="view-calendario" class="view-section">
             <div class="card">
@@ -514,6 +591,32 @@
         <a href="javascript:void(0)" class="tab-item" onclick="navegar('desafios')" id="tab-desafios">
             <i class="fas fa-fire"></i><span>Desafios</span>
         </a>
+
+        <div class="menu-expansivel" id="menuExpansivel">
+            <button class="btn-subir btn-1" onclick="navegar('grafico')">
+                <i class="fas fa-chart-line"></i>
+            </button>
+            <button class="btn-subir btn-2" onclick="navegar('diario')">
+                <i class="fas fa-book-open"></i>
+            </button>
+            <button class="btn-subir btn-3" onclick="navegar('proteina')">
+                <i class="fas fa-dumbbell"></i>
+            </button>
+            <button class="btn-subir btn-4" onclick="navegar('financas')">
+                <i class="fas fa-sack-dollar"></i>
+            </button>
+            <button class="btn-subir btn-5" onclick="navegar('metas')">
+                <i class="fas fa-bullseye"></i>
+            </button>
+            <button class="btn-subir btn-6" onclick="navegar('treino')">
+                <i class="fas fa-mitten"></i>
+            </button>
+
+            <button class="btn-principal" onclick="toggleMenuExtra()">
+                <i class="fas fa-plus" id="iconeToggle"></i>
+            </button>
+        </div>
+
         <a href="javascript:void(0)" class="tab-item" onclick="navegar('calendario')" id="tab-calendario">
             <i class="fas fa-calendar-alt"></i><span>Agenda</span>
         </a>
@@ -525,6 +628,37 @@
         </a>
     </nav>
     <script>
+    // FUNÇÃO DE GATILHO DO MENU (ATUALIZADA PARA 6 BOTÕES)
+    function toggleMenuExtra() {
+        const menu = document.getElementById('menuExpansivel');
+        const icone = document.getElementById('iconeToggle');
+        
+        // Liga/Desliga a classe 'active' que faz os 6 botões aparecerem
+        menu.classList.toggle('active');
+
+        // Efeito visual: Muda o ícone de + para X (fechar)
+        if (menu.classList.contains('active')) {
+            icone.classList.remove('fa-plus');
+            icone.classList.add('fa-times');
+        } else {
+            icone.classList.remove('fa-times');
+            icone.classList.add('fa-plus');
+        }
+    }
+
+    // Função auxiliar para fechar o menu automaticamente ao clicar em uma opção
+    // Isso evita que o leque de botões fique aberto em cima da nova tela
+    function fecharMenuAposSelecao() {
+        const menu = document.getElementById('menuExpansivel');
+        if (menu.classList.contains('active')) {
+            toggleMenuExtra();
+        }
+    }
+
+    // Hook para a função navegar (vamos conectar isso na Parte 3)
+    // Sempre que navegar for chamado, o menu fecha.
+</script>
+<script>
     /* ============================================================
        1. REGISTRO DO ESCUDO OFFLINE (SERVICE WORKER) 
        ============================================================ */
@@ -542,7 +676,6 @@
     
     const DB_NOME = "SoftwareFerreira_CaminhoGuerreiro_v2";
 
-    // Geração única de ID e Data de Instalação para novos usuários
     const novoId = Math.floor(Math.random() * 9000) + 1000;
     const dataAgora = Date.now();
 
@@ -599,6 +732,11 @@
             { id: 60, nome: "Forja da Alma", dias: 60, recompensa: 10000, ativo: false, progresso: 0, pro: true },
             { id: 90, nome: "Legado do Imperador", dias: 90, recompensa: 25000, ativo: false, progresso: 0, pro: true }
         ],
+        // NOVAS GAVETAS DO BANCO DE DADOS (Invisíveis e Seguras)
+        financas: { salarios: [], despesas: [], historico: {} },
+        metas: [],
+        treinos: { planosProntos: [], personalizados: [] },
+        diarioRetrospectiva: {},
         conquistas: [],
         inventario: [],
         config: { tema: 'dark' }
@@ -606,7 +744,12 @@
 
     let db = JSON.parse(localStorage.getItem(DB_NOME)) || dadosIniciais;
 
-    // Migração de Segurança para manter ID fixo
+    // Garante que as novas gavetas existam se o usuário já tiver o app instalado
+    if(!db.financas) db.financas = dadosIniciais.financas;
+    if(!db.metas) db.metas = dadosIniciais.metas;
+    if(!db.treinos) db.treinos = dadosIniciais.treinos;
+    if(!db.diarioRetrospectiva) db.diarioRetrospectiva = dadosIniciais.diarioRetrospectiva;
+
     if (!db.usuario.idInstalacao) {
         db.usuario.idInstalacao = novoId;
         db.usuario.dataInstalacao = dataAgora;
@@ -617,10 +760,6 @@
         localStorage.setItem(DB_NOME, JSON.stringify(db));
     }
 
-    /* ============================================================
-       RELÓGIO DO DESTINO - CONTROLE DE ACESSO (TRAVA REAL)
-       ============================================================ */
-    
     function verificarBloqueio() {
         if (db.usuario.isPro) {
             document.body.classList.remove('app-travado');
@@ -628,34 +767,23 @@
             if (tabs) tabs.style.display = 'flex';
             return false;
         }
-
         const agora = Date.now();
         const vinteDiasEmMs = 20 * 24 * 60 * 60 * 1000;
         const tempoPassado = agora - db.usuario.dataInstalacao;
-
         if (tempoPassado > vinteDiasEmMs) {
-            // TRAVA TOTAL - PARTE 2
             document.body.classList.add('app-travado');
-            
             const tabs = document.getElementById('bottom-tabs');
             if (tabs) tabs.style.display = 'none';
-            
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             const viewLock = document.getElementById('view-bloqueio');
             if (viewLock) viewLock.classList.add('active');
-
-            // Atualiza o ID na tela de bloqueio
             const displayId = document.getElementById('display-id-instalacao');
             if (displayId) displayId.innerText = db.usuario.idInstalacao;
-
             return true;
         }
         return false;
     }
 
-    /* ============================================================
-       FUNÇÃO COPIAR ID - PARTE 2
-       ============================================================ */
     function copiarID() {
         const id = db.usuario.idInstalacao;
         navigator.clipboard.writeText(id).then(() => {
@@ -664,12 +792,13 @@
     }
 
     /* ============================================================
-       SISTEMA DE NAVEGAÇÃO E TEMAS (COM BLOQUEIO ESTÁTICO)
+       SISTEMA DE NAVEGAÇÃO ATUALIZADO (6 NOVAS FUNÇÕES)
        ============================================================ */
-    
     function navegar(telaId) {
-        // Bloqueio Total após 20 dias (Exceto se for PRO)
         if (verificarBloqueio()) return;
+
+        // Fecha o menu expansível automaticamente ao navegar
+        if(typeof fecharMenuAposSelecao === "function") fecharMenuAposSelecao();
 
         document.querySelectorAll('.view-section').forEach(section => {
             section.classList.remove('active');
@@ -684,7 +813,7 @@
         const activeTab = document.getElementById('tab-' + telaId);
         if (activeTab) activeTab.classList.add('active');
 
-        // Renderizações específicas
+        // Gatilhos de Renderização (Originais + Novos)
         if (telaId === 'home') renderizarHome();
         if (telaId === 'habitos') renderizarCRUD();
         if (telaId === 'valores') renderizarValores(); 
@@ -692,6 +821,15 @@
         if (telaId === 'vicios') renderizarVicios();
         if (telaId === 'premium') renderizarPremium();
         if (telaId === 'desafios') renderizarDesafios();
+        
+        // Chamadas para as Novas Funções (Scripts que criaremos)
+        if (telaId === 'grafico') if(window.renderizarGraficos) renderizarGraficos();
+        if (telaId === 'diario') if(window.renderizarDiario) renderizarDiario();
+        if (telaId === 'proteina') if(window.renderizarCalculadora) renderizarCalculadora();
+        if (telaId === 'financas') if(window.renderizarFinancas) renderizarFinancas();
+        if (telaId === 'metas') if(window.renderizarMetas) renderizarMetas();
+        if (telaId === 'treino') if(window.renderizarTreinos) renderizarTreinos();
+
         if (telaId === 'config') {
             document.getElementById('config-id-display').innerText = db.usuario.idInstalacao;
         }
@@ -702,7 +840,6 @@
     function toggleTheme() {
         const body = document.body;
         const icon = document.getElementById('theme-toggle');
-        
         if (body.classList.contains('dark-mode')) {
             body.classList.replace('dark-mode', 'light-mode');
             icon.classList.replace('fa-moon', 'fa-sun');
@@ -715,10 +852,6 @@
         salvarDB();
     }
 
-    /* ============================================================
-       MECANISMO DE STREAK E DATAS
-       ============================================================ */
-    
     function getHoje() {
         return new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
     }
@@ -733,12 +866,10 @@
     function validarSessao() {
         const hoje = getHoje();
         const ultima = db.usuario.ultimaVisita;
-
         if (ultima !== hoje) {
             const ontemObj = new Date();
             ontemObj.setDate(ontemObj.getDate() - 1);
             const dataOntem = formatarDataParaID(ontemObj);
-
             if (!db.registros[dataOntem] || db.registros[dataOntem].length === 0) {
                 db.usuario.streak = 0;
             }
@@ -748,9 +879,6 @@
         verificarBloqueio();
     }
 
-    /* ============================================================
-       FRASES DO MESTRE
-       ============================================================ */
     const frasesGladiador = [
         "A sorte favorece os destemidos, guerreiro.",
         "Não é porque as coisas são difíceis que não ousamos; é porque não ousamos que elas são difíceis.",
@@ -861,7 +989,6 @@
         }
     }
 
-    // Inicialização
     validarSessao();
 </script>
 <script>
@@ -1819,6 +1946,1706 @@
 
         console.log("SISTEMA FERREIRA: MANUAL ATUALIZADO E SISTEMA OPERACIONAL.");
     };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <script>
+    function renderizarGraficos() {
+        const container = document.getElementById('view-grafico');
+        
+        // Coleta de dados dos últimos 7 dias
+        const labels = [];
+        const dadosHabitos = [];
+        const dadosTarefas = [];
+        
+        for (let i = 6; i >= 0; i--) {
+            const data = new Date();
+            data.setDate(data.getDate() - i);
+            const dataId = formatarDataParaID(data);
+            const diaSemana = data.toLocaleDateString('pt-BR', { weekday: 'short' });
+            
+            labels.push(diaSemana);
+            
+            // Calcula % de hábitos concluídos no dia
+            const registroDia = db.registros[dataId] || [];
+            const totalHabitos = db.habitos.length;
+            const concluidoHabitos = registroDia.length;
+            const porcHabitos = totalHabitos > 0 ? Math.round((concluidoHabitos / totalHabitos) * 100) : 0;
+            dadosHabitos.push(porcHabitos);
+
+            // Calcula % de tarefas concluídas no dia
+            const tarefasDia = db.progressoTarefas[dataId] || { total: 0, concluidas: 0 };
+            const porcTarefas = tarefasDia.total > 0 ? Math.round((tarefasDia.concluidas / tarefasDia.total) * 100) : 0;
+            dadosTarefas.push(porcTarefas);
+        }
+
+        container.innerHTML = `
+            <h2 class="gold center">Estatísticas de Guerra</h2>
+            <p class="small center" style="margin-bottom:20px;">Análise dos últimos 7 dias de combate.</p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <div class="card center" style="padding: 10px; border-top: 2px solid var(--cor-ouro);">
+                    <i class="fas fa-coins gold"></i>
+                    <p class="small">Riqueza</p>
+                    <h4 class="gold">${db.usuario.moedas}</h4>
+                </div>
+                <div class="card center" style="padding: 10px; border-top: 2px solid var(--cor-ouro);">
+                    <i class="fas fa-bolt gold"></i>
+                    <p class="small">Poder (XP)</p>
+                    <h4 class="gold">${db.usuario.xp}</h4>
+                </div>
+            </div>
+
+            <div class="card">
+                <canvas id="chartEvolucao" style="width:100%; height:250px;"></canvas>
+            </div>
+
+            <div class="card card-guerreiro">
+                <h4 class="gold"><i class="fas fa-shield-virus"></i> Escudo Ativo</h4>
+                ${db.vicios.map(v => `
+                    <div style="margin-top:10px;">
+                        <p class="small">${v.nome}</p>
+                        <p style="font-weight:bold; color:var(--cor-ouro-brilho);">${v.diasLimpos} Dias de Pureza</p>
+                    </div>
+                `).join('')}
+            </div>
+
+            <button class="btn-guerreiro" onclick="navegar('home')">Voltar ao Quartel</button>
+        `;
+
+        // Inicializa o gráfico após renderizar o HTML
+        const ctx = document.getElementById('chartEvolucao').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Hábitos %',
+                    data: dadosHabitos,
+                    borderColor: '#D4AF37',
+                    backgroundColor: 'rgba(212, 175, 55, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                }, {
+                    label: 'Tarefas %',
+                    data: dadosTarefas,
+                    borderColor: '#E0E0E0',
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true, max: 100, grid: { color: '#333' }, ticks: { color: '#888' } },
+                    x: { grid: { display: false }, ticks: { color: '#888' } }
+                },
+                plugins: {
+                    legend: { labels: { color: '#D4AF37', font: { size: 10 } } }
+                }
+            }
+        });
+    }
+
+    // Define a função no objeto window para o navegar() encontrar
+    window.renderizarGraficos = renderizarGraficos;
+</script>
+<script>
+    function renderizarDiario() {
+        const container = document.getElementById('view-diario');
+        const agora = new Date();
+        const hora = agora.getHours();
+        const hojeId = getHoje();
+        
+        // Regra de horário: Abre das 18h às 23:59h
+        const podeEscrever = hora >= 18 && hora < 24;
+
+        // Limpeza automática: Mantém apenas os últimos 15 dias (exceto favoritos)
+        limparDiarioAntigo();
+
+        let html = `
+            <h2 class="gold center">Retrospectiva Noturna</h2>
+            <p class="small center" style="margin-bottom:20px;">Reflexão e Auto-exame</p>
+        `;
+
+        // Área de Escrita (Se estiver no horário)
+        if (podeEscrever) {
+            const jaEscreveu = db.diarioRetrospectiva[hojeId] && db.diarioRetrospectiva[hojeId].concluido;
+            
+            html += `
+                <div class="card card-guerreiro">
+                    <h4 class="gold center">O Exame de Hoje</h4>
+                    <p class="small italic center">"A noite é o espelho do dia."</p>
+                    <div style="margin-top:15px;">
+                        <p class="small gold">O que fiz de bom hoje?</p>
+                        <textarea id="diario-bom" class="input-ativacao" style="text-align:left; height:80px;" ${jaEscreveu ? 'disabled' : ''}>${db.diarioRetrospectiva[hojeId]?.bom || ''}</textarea>
+                        
+                        <p class="small gold" style="margin-top:10px;">O que posso melhorar amanhã?</p>
+                        <textarea id="diario-melhorar" class="input-ativacao" style="text-align:left; height:80px;" ${jaEscreveu ? 'disabled' : ''}>${db.diarioRetrospectiva[hojeId]?.melhorar || ''}</textarea>
+                        
+                        ${!jaEscreveu ? `
+                            <button class="btn-guerreiro" onclick="salvarReflexao()" style="margin-top:15px;">
+                                <i class="fas fa-feather-alt"></i> Selar Reflexão (+5 XP)
+                            </button>
+                        ` : '<p class="center gold" style="margin-top:10px;"><i class="fas fa-check-circle"></i> Reflexão Concluída</p>'}
+                    </div>
+                </div>
+            `;
+        } else {
+            html += `
+                <div class="card center" style="opacity:0.7;">
+                    <i class="fas fa-moon gold" style="font-size:2rem;"></i>
+                    <p class="gold" style="margin-top:10px;">O pergaminho abre às 18:00h.</p>
+                    <p class="small">Reflita sobre suas ações ao final do dia.</p>
+                </div>
+            `;
+        }
+
+        // Histórico dos Últimos 15 Dias
+        html += `
+            <h4 class="gold" style="margin:20px 0 10px 0;">Memórias Recentes (15 dias)</h4>
+            <div id="historico-diario-lista"></div>
+        `;
+
+        container.innerHTML = html;
+        renderizarListaHistorico();
+    }
+
+    function salvarReflexao() {
+        const bom = document.getElementById('diario-bom').value;
+        const melhorar = document.getElementById('diario-melhorar').value;
+        const hojeId = getHoje();
+
+        if (bom.trim() === "" || melhorar.trim() === "") {
+            alert("Guerreiro, não deixe o pergaminho em branco!");
+            return;
+        }
+
+        db.diarioRetrospectiva[hojeId] = {
+            bom: bom,
+            melhorar: melhorar,
+            concluido: true,
+            favorito: false,
+            timestamp: Date.now()
+        };
+
+        db.usuario.xp += 5;
+        salvarDB();
+        renderizarDiario();
+        if(window.renderizarHome) renderizarHome(); // Atualiza XP na tela
+        alert("Reflexão salva! +5 XP de sabedoria.");
+    }
+
+    function renderizarListaHistorico() {
+        const lista = document.getElementById('historico-diario-lista');
+        const datas = Object.keys(db.diarioRetrospectiva).sort((a,b) => {
+            return db.diarioRetrospectiva[b].timestamp - db.diarioRetrospectiva[a].timestamp;
+        });
+
+        if (datas.length === 0) {
+            lista.innerHTML = '<p class="small center">Nenhuma memória salva ainda.</p>';
+            return;
+        }
+
+        lista.innerHTML = datas.map(dataId => {
+            const entry = db.diarioRetrospectiva[dataId];
+            return `
+                <div class="card" style="padding:12px; margin-bottom:10px; border-left: 3px solid ${entry.favorito ? 'var(--cor-ouro)' : '#444'}">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span class="gold" style="font-size:0.8rem;">${dataId}</span>
+                        <i class="${entry.favorito ? 'fas' : 'far'} fa-star gold" onclick="toggleFavoritoDiario('${dataId}')"></i>
+                    </div>
+                    <div style="margin-top:8px;">
+                        <p class="small" style="color:#aaa;"><b>Fiz de bom:</b> ${entry.bom}</p>
+                        <p class="small" style="color:#aaa;"><b>Melhorar:</b> ${entry.melhorar}</p>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function toggleFavoritoDiario(dataId) {
+        db.diarioRetrospectiva[dataId].favorito = !db.diarioRetrospectiva[dataId].favorito;
+        salvarDB();
+        renderizarListaHistorico();
+    }
+
+    function limparDiarioAntigo() {
+        const agora = Date.now();
+        const quinzeDiasMs = 15 * 24 * 60 * 60 * 1000;
+        let alterado = false;
+
+        for (let dataId in db.diarioRetrospectiva) {
+            const entry = db.diarioRetrospectiva[dataId];
+            // Se for mais antigo que 15 dias E não for favorito, apaga
+            if ((agora - entry.timestamp) > quinzeDiasMs && !entry.favorito) {
+                delete db.diarioRetrospectiva[dataId];
+                alterado = true;
+            }
+        }
+        if (alterado) salvarDB();
+    }
+
+    // Vincula ao sistema de navegação
+    window.renderizarDiario = renderizarDiario;
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    let mesOffsetFinancas = 0;
+
+    function renderizarFinancas() {
+        const container = document.getElementById('view-financas');
+        const dataAlvo = new Date();
+        dataAlvo.setMonth(dataAlvo.getMonth() + mesOffsetFinancas);
+        
+        const mesNome = dataAlvo.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase();
+        const mesId = dataAlvo.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
+
+        let dados;
+        if (mesOffsetFinancas === 0) {
+            dados = { 
+                salarios: db.financas.salarios || [], 
+                despesas: db.financas.despesas || [] 
+            };
+        } else {
+            dados = db.financas.historico[mesId] || { salarios: [], despesas: [] };
+        }
+
+        const totalRenda = dados.salarios.reduce((acc, curr) => acc + curr.valor, 0);
+        const totalNec = dados.despesas.filter(d => d.tipo === 'necessario').reduce((acc, curr) => acc + curr.valor, 0);
+        const totalLaz = dados.despesas.filter(d => d.tipo === 'lazer').reduce((acc, curr) => acc + curr.valor, 0);
+        const totalLeg = dados.despesas.filter(d => d.tipo === 'legado').reduce((acc, curr) => acc + curr.valor, 0);
+        const totalGasto = totalNec + totalLaz + totalLeg;
+        const saldo = totalRenda - totalGasto;
+
+        container.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <button onclick="navegarMesFinancas(-1)" style="background:none; border:none; color:var(--cor-ouro); font-size:1.2rem;"><i class="fas fa-chevron-left"></i></button>
+                <h2 class="gold center" style="font-size: 1.1rem; margin:0;">${mesNome}</h2>
+                <button onclick="navegarMesFinancas(1)" style="background:none; border:none; color:var(--cor-ouro); font-size:1.2rem;"><i class="fas fa-chevron-right"></i></button>
+            </div>
+
+            <div class="card" style="border: 2px solid ${saldo >= 0 ? 'var(--cor-ouro)' : 'var(--cor-perigo)'}; background: #000; text-align: center;">
+                <p class="small gold">SALDO FINAL</p>
+                <h1 style="color: ${saldo >= 0 ? '#fff' : 'var(--cor-perigo)'}; margin: 5px 0;">R$ ${saldo.toFixed(2)}</h1>
+                <div style="display: flex; justify-content: space-around; border-top: 1px solid #222; padding-top: 10px; margin-top: 10px;">
+                    <div><p class="small">Entradas</p><span style="color:#2ecc71; font-weight:bold;">+ R$ ${totalRenda.toFixed(2)}</span></div>
+                    <div><p class="small">Saídas</p><span style="color:#e74c3c; font-weight:bold;">- R$ ${totalGasto.toFixed(2)}</span></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <p class="center gold small" style="margin-bottom:10px;">DISTRIBUIÇÃO ATUAL</p>
+                <div style="max-width: 160px; margin: 0 auto;">
+                    <canvas id="chartFinancas"></canvas>
+                </div>
+            </div>
+
+            ${mesOffsetFinancas === 0 ? `
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <button class="btn-guerreiro" onclick="lancarFinanca('renda')" style="background: #1b5e20; box-shadow: 0 4px 0 #0d3211;">
+                    <i class="fas fa-arrow-up"></i> ENTRADA
+                </button>
+                <button class="btn-guerreiro" onclick="lancarFinanca('despesa')" style="background: #b71c1c; box-shadow: 0 4px 0 #5f0e0e;">
+                    <i class="fas fa-arrow-down"></i> SAÍDA
+                </button>
+            </div>
+            ` : ''}
+
+            <div class="card card-guerreiro">
+                <h4 class="gold center small" style="margin-bottom:15px;">SAÚDE DAS COLUNAS</h4>
+                ${criarBarraMeta("NECESSÁRIO (50%)", totalNec, totalRenda, 50, "#3498db")}
+                ${criarBarraMeta("LAZER (30%)", totalLaz, totalRenda, 30, "#f1c40f")}
+                ${criarBarraMeta("LEGADO (20%)", totalLeg, totalRenda, 20, "#2ecc71")}
+            </div>
+
+            <div class="card">
+                <p class="gold small" style="margin-bottom:15px; border-bottom: 1px solid #333; padding-bottom: 5px;">
+                    <i class="fas fa-list-ul"></i> EXTRATO DO MÊS
+                </p>
+                <div id="extrato-lista">
+                    ${renderizarItensExtrato(dados)}
+                </div>
+            </div>
+
+            ${mesOffsetFinancas === 0 && totalRenda > 0 ? `
+            <button class="btn-guerreiro" onclick="finalizarMesFinanceiro()" style="background:#222; border:1px solid #444; font-size:0.7rem; margin-top:10px;">
+                <i class="fas fa-lock"></i> FECHAR E ARQUIVAR MÊS
+            </button>
+            ` : ''}
+        `;
+
+        initChartFinancas(totalNec, totalLaz, totalLeg);
+    }
+
+    function renderizarItensExtrato(dados) {
+        const todos = [...dados.salarios, ...dados.despesas].sort((a, b) => b.data - a.data);
+        if (todos.length === 0) return "<p class='small center italic'>Nenhuma transação este mês.</p>";
+
+        return todos.map(item => {
+            const isRenda = item.tipo === 'renda';
+            const corValor = isRenda ? '#2ecc71' : '#e74c3c';
+            const sinal = isRenda ? '+' : '-';
+            const icon = isRenda ? 'fa-circle-chevron-up' : 'fa-circle-chevron-down';
+            
+            return `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #222;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas ${icon}" style="color: ${corValor}; font-size: 0.8rem;"></i>
+                        <div>
+                            <p style="font-size: 0.85rem; margin:0;">${item.nome}</p>
+                            <span style="font-size: 0.6rem; color: #666; text-transform: uppercase;">${item.tipo}</span>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="font-size: 0.85rem; font-weight: bold; color: ${corValor}; margin:0;">${sinal} R$ ${item.valor.toFixed(2)}</p>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function criarBarraMeta(titulo, valor, rendaTotal, metaPorcent, cor) {
+        const perc = rendaTotal > 0 ? (valor / rendaTotal) * 100 : 0;
+        const statusCor = perc > metaPorcent ? 'var(--cor-perigo)' : 'var(--cor-ouro-brilho)';
+        return `
+            <div style="margin-bottom: 10px;">
+                <div style="display:flex; justify-content:space-between; font-size:0.65rem; margin-bottom:3px;">
+                    <span>${titulo}</span>
+                    <span style="color:${statusCor}">${perc.toFixed(0)}% / ${metaPorcent}%</span>
+                </div>
+                <div class="progress-outer" style="height:5px; background:#1a1a1a;">
+                    <div class="progress-inner" style="width:${Math.min(perc, 100)}%; background:${cor}; shadow: 0 0 5px ${cor};"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    function lancarFinanca(categoria) {
+        const nome = prompt(`Descrição da ${categoria}:`);
+        const valor = parseFloat(prompt("Valor (R$):"));
+        if (!nome || isNaN(valor)) return;
+
+        if (categoria === 'renda') {
+            db.financas.salarios.push({ nome, valor, data: Date.now(), tipo: 'renda' });
+        } else {
+            const sub = prompt("Classifique este gasto:\n1. Necessário (Aluguel, Luz, Comida)\n2. Lazer (Saídas, Streaming, Hobbies)\n3. Legado (Dívidas, Investimentos)");
+            let tipo = 'necessario';
+            if (sub === '2') tipo = 'lazer';
+            if (sub === '3') tipo = 'legado';
+            db.financas.despesas.push({ nome, valor, data: Date.now(), tipo });
+        }
+        salvarDB();
+        renderizarFinancas();
+    }
+
+    function navegarMesFinancas(direcao) {
+        mesOffsetFinancas += direcao;
+        renderizarFinancas();
+    }
+
+    function finalizarMesFinanceiro() {
+        if (!confirm("Isso arquiva o mês atual e limpa a tela para o próximo. Confirma?")) return;
+        const mesId = new Date().toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
+        db.financas.historico[mesId] = { salarios: [...db.financas.salarios], despesas: [...db.financas.despesas] };
+        db.financas.salarios = [];
+        db.financas.despesas = [];
+        salvarDB();
+        renderizarFinancas();
+    }
+
+    function initChartFinancas(n, l, i) {
+        const canvas = document.getElementById('chartFinancas');
+        if (!canvas) return;
+        if (n === 0 && l === 0 && i === 0) {
+            canvas.parentElement.innerHTML = "<p class='small center italic'>Sem dados para o gráfico.</p>";
+            return;
+        }
+        new Chart(canvas, {
+            type: 'doughnut',
+            data: {
+                labels: ['Nec.', 'Laz.', 'Leg.'],
+                datasets: [{
+                    data: [n, l, i],
+                    backgroundColor: ['#3498db', '#f1c40f', '#2ecc71'],
+                    borderWidth: 0
+                }]
+            },
+            options: { cutout: '70%', plugins: { legend: { display: false } } }
+        });
+    }
+
+    window.renderizarFinancas = renderizarFinancas;
+</script>
+<script>
+    function renderizarMetas() {
+        const container = document.getElementById('view-metas');
+        
+        // Cálculo de Capacidade Financeira (Vem da Tesouraria)
+        const totalRenda = db.financas.salarios.reduce((acc, curr) => acc + curr.valor, 0);
+        const totalGasto = db.financas.despesas.reduce((acc, curr) => acc + curr.valor, 0);
+        const sobraMensal = totalRenda - totalGasto;
+
+        container.innerHTML = `
+            <h2 class="gold center">Objetivos de Guerra</h2>
+            <p class="small center" style="margin-bottom: 20px;">Transforme desejos em planos de conquista.</p>
+
+            <button class="btn-guerreiro" onclick="abrirModalMeta()" style="margin-bottom: 20px;">
+                <i class="fas fa-bullseye"></i> Traçar Nova Meta
+            </button>
+
+            <div id="lista-metas-cards">
+                ${renderizarCardsMetas(sobraMensal)}
+            </div>
+        `;
+    }
+
+    function renderizarCardsMetas(sobra) {
+        if (db.metas.length === 0) return `<p class="small center italic">Nenhuma meta traçada ainda.</p>`;
+
+        return db.metas.map((meta, index) => {
+            let infoExtra = "";
+            let progressoFin = 0;
+
+            // Lógica Financeira
+            if (meta.tipo === 'dinheiro' || meta.tipo === 'ambos') {
+                const mesesRestantes = sobra > 0 ? Math.ceil((meta.valorObjetivo - meta.valorAtual) / sobra) : "∞";
+                progressoFin = (meta.valorAtual / meta.valorObjetivo) * 100;
+                infoExtra += `
+                    <div style="margin-top:10px; border-top:1px solid #333; padding-top:10px;">
+                        <p class="small gold">FINANCEIRO: R$ ${meta.valorAtual} / R$ ${meta.valorObjetivo}</p>
+                        <div class="progress-outer" style="height:6px;"><div class="progress-inner" style="width:${Math.min(progressoFin, 100)}%"></div></div>
+                        <p class="small" style="font-size:0.65rem;">Capacidade atual: R$ ${sobra.toFixed(2)}/mês. <br> 
+                        <b>Estimativa: ${mesesRestantes} meses</b> para concluir.</p>
+                    </div>
+                `;
+            }
+
+            // Lógica de Hábito
+            if (meta.tipo === 'habito' || meta.tipo === 'ambos') {
+                infoExtra += `
+                    <div style="margin-top:10px; border-top:1px solid #333; padding-top:10px;">
+                        <p class="small" style="color:#3498db;"><i class="fas fa-Sync"></i> REQUER DISCIPLINA</p>
+                        <p class="small" style="font-size:0.65rem;">Lembre-se de adicionar os hábitos necessários no seu <b>Pergaminho</b> para sustentar esta meta.</p>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="card card-guerreiro">
+                    <div style="display:flex; justify-content:space-between; align-items:start;">
+                        <div>
+                            <h4 class="gold">${meta.nome.toUpperCase()}</h4>
+                            <p class="small">Prazo: ${new Date(meta.prazo).toLocaleDateString('pt-BR')}</p>
+                        </div>
+                        <button onclick="excluirMeta(${index})" style="background:none; border:none; color:var(--cor-perigo);"><i class="fas fa-trash"></i></button>
+                    </div>
+                    ${infoExtra}
+                    <div style="margin-top:15px; display:flex; gap:10px;">
+                        ${meta.tipo !== 'habito' ? `<button class="btn-guerreiro" style="font-size:0.6rem; padding:5px;" onclick="aportarMeta(${index})">APORTAR DINHEIRO</button>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function abrirModalMeta() {
+        const nome = prompt("Qual o nome da sua meta? (Ex: Comprar Carro, Shape de Verão)");
+        if (!nome) return;
+
+        const tipo = prompt("O que essa meta exige?\n1. Apenas Dinheiro\n2. Apenas Hábitos\n3. Dinheiro e Hábitos");
+        let tipoFinal = 'dinheiro';
+        if (tipo === '2') tipoFinal = 'habito';
+        if (tipo === '3') tipoFinal = 'ambos';
+
+        let valorMeta = 0;
+        if (tipoFinal !== 'habito') {
+            valorMeta = parseFloat(prompt("Quanto dinheiro você precisa no total?"));
+        }
+
+        const prazo = prompt("Em quantos meses pretende realizar?");
+        const dataPrazo = new Date();
+        dataPrazo.setMonth(dataPrazo.getMonth() + parseInt(prazo || 1));
+
+        db.metas.push({
+            nome,
+            tipo: tipoFinal,
+            valorObjetivo: valorMeta,
+            valorAtual: 0,
+            prazo: dataPrazo.getTime(),
+            criadoEm: Date.now()
+        });
+
+        salvarDB();
+        renderizarMetas();
+
+        if (tipoFinal === 'habito' || tipoFinal === 'ambos') {
+            alert("🏛️ CONSELHO DO MESTRE:\nEsta meta exige constância. Vá agora ao 'Pergaminho' e crie hábitos que te levem a esse objetivo!");
+        }
+    }
+
+    function aportarMeta(index) {
+        const valor = parseFloat(prompt("Quanto você está guardando para esta meta agora?"));
+        if (isNaN(valor)) return;
+        
+        db.metas[index].valorAtual += valor;
+        
+        // Opcional: Registrar como uma saída na tesouraria automaticamente
+        if(confirm("Deseja registrar esse valor como uma saída de 'Legado' nas suas finanças?")) {
+            db.financas.despesas.push({
+                nome: `Reserva: ${db.metas[index].nome}`,
+                valor: valor,
+                data: Date.now(),
+                tipo: 'legado'
+            });
+        }
+        
+        salvarDB();
+        renderizarMetas();
+    }
+
+    function excluirMeta(index) {
+        if (confirm("Deseja abandonar este objetivo?")) {
+            db.metas.splice(index, 1);
+            salvarDB();
+            renderizarMetas();
+        }
+    }
+
+    window.renderizarMetas = renderizarMetas;
+</script>
+<script>
+    function renderizarCalculadora() {
+        const container = document.getElementById('view-proteina');
+        
+        container.innerHTML = `
+            <h2 class="gold center">Forja Nutricional</h2>
+            <p class="small center" style="margin-bottom: 20px;">O combustível define a força do seu império.</p>
+
+            <div class="card card-guerreiro">
+                <label class="small gold">SEU PESO ATUAL (KG)</label>
+                <input type="number" id="nutri-peso" class="input-ativacao" placeholder="Ex: 80" style="margin: 10px 0; width: 100%; font-size: 1.5rem;">
+                
+                <label class="small gold">OBJETIVO DE GUERRA</label>
+                <select id="nutri-objetivo" class="input-ativacao" style="margin: 10px 0; width: 100%; background: #111; color: white;">
+                    <option value="ganhar">Ganhar Massa (Bulking)</option>
+                    <option value="perder">Definição/Perder Gordura (Cutting)</option>
+                    <option value="manter">Manter Performance</option>
+                </select>
+
+                <label class="small gold">NÍVEL DE ATIVIDADE</label>
+                <select id="nutri-intensidade" class="input-ativacao" style="margin: 10px 0; width: 100%; background: #111; color: white;">
+                    <option value="1.6">Leve (Sedentário/Pouco treino)</option>
+                    <option value="2.0" selected>Moderado (Calistenia/Trabalho Rural)</option>
+                    <option value="2.4">Intenso (Muay Thai + Treino Diário)</option>
+                </select>
+
+                <button class="btn-guerreiro" onclick="calcularNutricao()" style="margin-top: 10px;">
+                    <i class="fas fa-fire"></i> CALCULAR MACROS
+                </button>
+            </div>
+
+            <div id="resultado-nutricao" style="display: none;"></div>
+        `;
+    }
+
+    function calcularNutricao() {
+        const peso = parseFloat(document.getElementById('nutri-peso').value);
+        const objetivo = document.getElementById('nutri-objetivo').value;
+        const fator = parseFloat(document.getElementById('nutri-intensidade').value);
+        const resDiv = document.getElementById('resultado-nutricao');
+
+        if (!peso || peso <= 0) {
+            alert("Guerreiro, digite seu peso corretamente!");
+            return;
+        }
+
+        // 1. CÁLCULO DE PROTEÍNA (Fixa para manter/ganhar músculo)
+        const proteina = peso * 2.1; // 2.1g/kg é o padrão ouro para atletas
+
+        // 2. CÁLCULO DE CARBOIDRATOS (Varia conforme objetivo)
+        let carboFator = 4; // Padrão
+        if (objetivo === 'ganhar') carboFator = 5.5; // Mais energia para crescer
+        if (objetivo === 'perder') carboFator = 2.5; // Menos carbo para queimar gordura
+        if (fator >= 2.4) carboFator += 1; // Se treina muito pesado, precisa de mais carbo
+
+        const carboidratos = peso * carboFator;
+
+        // 3. CÁLCULO DE ÁGUA
+        const aguaFator = fator >= 2.0 ? 50 : 35;
+        const aguaTotal = (peso * aguaFator) / 1000;
+
+        resDiv.style.display = 'block';
+        resDiv.innerHTML = `
+            <div class="card" style="border: 1px solid #2ecc71; background: rgba(46, 204, 113, 0.05); margin-bottom:10px;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i class="fas fa-drumstick-bite" style="font-size: 1.8rem; color: #2ecc71;"></i>
+                    <div>
+                        <p class="small">PROTEÍNA (CONSTRUÇÃO)</p>
+                        <h2 style="color: #fff; margin:0;">${proteina.toFixed(0)}g <span class="small">/ dia</span></h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="border: 1px solid #f1c40f; background: rgba(241, 196, 15, 0.05); margin-bottom:10px;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i class="fas fa-bolt" style="font-size: 1.8rem; color: #f1c40f;"></i>
+                    <div>
+                        <p class="small">CARBOIDRATOS (ENERGIA)</p>
+                        <h2 style="color: #fff; margin:0;">${carboidratos.toFixed(0)}g <span class="small">/ dia</span></h2>
+                    </div>
+                </div>
+                <p class="small" style="font-size:0.6rem; margin-top:5px;">Ajustado para seu objetivo de <b>${objetivo.toUpperCase()}</b>.</p>
+            </div>
+
+            <div class="card" style="border: 1px solid #3498db; background: rgba(52, 152, 219, 0.05);">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i class="fas fa-tint" style="font-size: 1.8rem; color: #3498db;"></i>
+                    <div>
+                        <p class="small">HIDRATAÇÃO</p>
+                        <h2 style="color: #fff; margin:0;">${aguaTotal.toFixed(1)}L <span class="small">/ dia</span></h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="background:#000; border: 1px dashed var(--cor-ouro);">
+                <p class="small gold center">ESTRATÉGIA DO DIA</p>
+                <p class="small italic center" style="font-size: 0.7rem;">
+                    ${objetivo === 'perder' ? 'Priorize carboidratos complexos (batata doce, aveia) para manter a saciedade.' : 'Não tenha medo dos carboidratos; eles são o combustível para seus treinos de Muay Thai e Calistenia!'}
+                </p>
+            </div>
+        `;
+    }
+
+    window.renderizarCalculadora = renderizarCalculadora;
+</script>
+<script>
+/* ============================================================
+   MÓDULO DE TREINO ESTOICO - SOFTWARE FERREIRA
+   Sincronizado com os 6 Planos de Calistenia
+   ============================================================ */
+
+const PLANOS_DE_TREINO = [
+    {
+        id: "plano_1_adaptacao",
+        titulo: "1. Plano de Treino de Adaptação (Full Body)",
+        perfil: "Iniciantes / Adaptação",
+        objetivo: "Adaptação neuromuscular (Realizar por 3 semanas)",
+        frequencia: "3x por semana (Segunda, Quarta e Sexta)",
+        descanso: "2 minutos",
+        rotinas: [
+            {
+                dia: "Segunda, Quarta e Sexta-feira: Full Body",
+                exercicios: [
+                    { nome: "Flexão clássica", series: "3", reps: "2-3 rep. menos da falha", obs: "Foco na execução correta." },
+                    { nome: "Flexão militar", series: "3", reps: "2-3 rep. menos da falha", obs: "Mãos na largura dos ombros." },
+                    { nome: "Barra australiana pronada", series: "3", reps: "Até a falha", obs: "Ou Barra fixa pronada com auxílio: 5-8 rep." },
+                    { nome: "Barra australiana supinada fechada", series: "3", reps: "Até a falha", obs: "Ou Barra fixa supinada fechada com auxílio: 5-8 rep." },
+                    { nome: "Agachamento explosivo", series: "3", reps: "40 segundos", obs: "Foco na execução rápida e controlada." },
+                    { nome: "Agachamento livre", series: "3", reps: "15-20 repetições", obs: "Coluna ereta." },
+                    { nome: "Abdominal", series: "3", reps: "15-20 repetições", obs: "Contraia bem o core." },
+                    { nome: "Prancha isométrica", series: "3", reps: "40 segundos", obs: "Corpo alinhado como uma tábua." }
+                ]
+            },
+            { dia: "Sábado", exercicios: [{ nome: "HIIT Leve", series: "Ciclos", reps: "Varia", obs: "Treino intervalado de alta intensidade." }] }
+        ]
+    },
+    {
+        id: "plano_2_ganhar_peso",
+        titulo: "2. Ganhar Peso e Massa Muscular",
+        perfil: "Ectomorfos / Hipertrofia",
+        objetivo: "Volume robusto para estimular hipertrofia máxima.",
+        frequencia: "4x por semana",
+        descanso: "2 minutos",
+        rotinas: [
+            {
+                dia: "Segunda-feira: Peito, Tríceps e Ombros",
+                exercicios: [
+                    { nome: "Flexão clássica", series: "3", reps: "Até a falha", obs: "Ou 1-2 repetições da falha." },
+                    { nome: "Flexão Declinada", series: "3", reps: "Até a falha", obs: "Pés em local elevado." },
+                    { nome: "Flexão inclinada", series: "3", reps: "Até a falha", obs: "Mãos em local elevado." },
+                    { nome: "Dips na cadeira", series: "3", reps: "8-15 repetições", obs: "Foco no tríceps." },
+                    { nome: "Tríceps no banco", series: "3", reps: "Até a falha", obs: "Extensão total do cotovelo." },
+                    { nome: "Flexão Pike", series: "3", reps: "8-12 repetições", obs: "Foco nos ombros." }
+                ]
+            },
+            {
+                dia: "Terça-feira: Costas e Bíceps",
+                exercicios: [
+                    { nome: "Barra fixa pronada aberta", series: "3", reps: "6-10 repetições", obs: "Ou Barra australiana aberta." },
+                    { nome: "Barra fixa pronada", series: "3", reps: "6-10 repetições", obs: "Ou Barra australiana." },
+                    { nome: "Barra fixa pronada fechada", series: "3", reps: "6-10 repetições", obs: "Foco no braquial." },
+                    { nome: "Barra fixa supinada", series: "3", reps: "6-10 repetições", obs: "Foco no bíceps." },
+                    { nome: "Barra australiana supinada fechada", series: "3", reps: "Até a falha", obs: "Finalizador de bíceps." }
+                ]
+            },
+            {
+                dia: "Quinta-feira: Pernas e Abdômen",
+                exercicios: [
+                    { nome: "Agachamento explosivo", series: "3", reps: "60 segundos", obs: "Pule se conseguir." },
+                    { nome: "Agachamento búlgaro", series: "3", reps: "10-15 rep. cada lado", obs: "Um pé apoiado atrás." },
+                    { nome: "Agachamento livre", series: "3", reps: "15-25 repetições", obs: "Mantenha o calcanhar no chão." },
+                    { nome: "Cadeira isométrica", series: "3", reps: "40-60 segundos", obs: "Ângulo de 90 graus." },
+                    { nome: "Abdominal", series: "3", reps: "20-30 repetições", obs: "Padrão." },
+                    { nome: "Abdominal infra", series: "3", reps: "12-18 repetições", obs: "Elevação de pernas." },
+                    { nome: "Canoa isométrica", series: "3", reps: "60 segundos", obs: "Estática no chão." }
+                ]
+            },
+            {
+                dia: "Sexta-feira: Costas e Peito",
+                exercicios: [
+                    { nome: "Barra fixa pronada aberta", series: "3", reps: "Até a falha", obs: "Ou Barra australiana aberta." },
+                    { nome: "Barra fixa pronada", series: "3", reps: "Até a falha", obs: "Foco dorsal." },
+                    { nome: "Flexão clássica", series: "3", reps: "Até a falha", obs: "Padrão." },
+                    { nome: "Flexão Declinada", series: "3", reps: "Até a falha", obs: "Peito superior." }
+                ]
+            }
+        ]
+    }
+];
+/* ============================================================
+   MÓDULO DE TREINO ESTOICO - PARTE 2: PLANOS 3, 4, 5 E 6
+   ============================================================ */
+
+PLANOS_DE_TREINO.push(
+    {
+        id: "plano_3_perder_peso",
+        titulo: "3. Perder Peso e Ganhar Massa Muscular",
+        perfil: "Definição / Queima",
+        objetivo: "Combina hipertrofia com cardio para maximizar queima calórica.",
+        frequencia: "4x força + 2-3x cardio",
+        descanso: "2 minutos (Força)",
+        rotinas: [
+            {
+                dia: "Segunda-feira: Peito, Tríceps e Ombros + HIIT",
+                exercicios: [
+                    { nome: "Flexão clássica", series: "3", reps: "Falha (ou 1-2 rep. antes)", obs: "" },
+                    { nome: "Flexão Declinada", series: "3", reps: "Até a falha", obs: "" },
+                    { nome: "Flexão inclinada", series: "3", reps: "Até a falha", obs: "" },
+                    { nome: "Dips", series: "3", reps: "6-12 repetições", obs: "" },
+                    { nome: "Tríceps no banco", series: "3", reps: "Até a falha", obs: "" },
+                    { nome: "Flexão Pike", series: "3", reps: "8-12 repetições", obs: "Foco ombro." },
+                    { nome: "PÓS-TREINO: HIIT", series: "2 ciclos", reps: "Máximo esforço", obs: "Realizar logo após a força." }
+                ]
+            },
+            {
+                dia: "Terça-feira: Costas e Bíceps",
+                exercicios: [
+                    { nome: "Barra fixa pronada aberta", series: "3", reps: "6-10 rep.", obs: "Ou Barra australiana." },
+                    { nome: "Barra fixa pronada", series: "3", reps: "6-10 rep.", obs: "Ou Barra australiana." },
+                    { nome: "Barra fixa pronada fechada", series: "3", reps: "6-10 rep.", obs: "" },
+                    { nome: "Barra fixa supinada", series: "3", reps: "6-10 rep.", obs: "" },
+                    { nome: "Barra australiana supinada fechada", series: "3", reps: "Até a falha", obs: "" }
+                ]
+            },
+            {
+                dia: "Quarta-feira: Cardio",
+                exercicios: [{ nome: "Corrida (20 min)", series: "4 Ciclos", reps: "5 min cada", obs: "5 min correndo / 1 min descanso." }]
+            },
+            {
+                dia: "Quinta-feira: Pernas e Abdômen",
+                exercicios: [
+                    { nome: "Agachamento explosivo", series: "3", reps: "60 segundos", obs: "" },
+                    { nome: "Agachamento búlgaro", series: "3", reps: "10-15 por lado", obs: "" },
+                    { nome: "Agachamento livre", series: "3", reps: "15-25 rep.", obs: "" },
+                    { nome: "Cadeira isométrica", series: "3", reps: "40-60 seg.", obs: "" },
+                    { nome: "Abdominal", series: "3", reps: "20-30 rep.", obs: "" },
+                    { nome: "Abdominal infra", series: "3", reps: "12-18 rep.", obs: "" },
+                    { nome: "Canoa isométrica", series: "3", reps: "60 segundos", obs: "" }
+                ]
+            },
+            {
+                dia: "Sexta-feira: Costas e Peito",
+                exercicios: [
+                    { nome: "Barra fixa pronada aberta", series: "3", reps: "Até a falha", obs: "" },
+                    { nome: "Barra fixa pronada", series: "3", reps: "Até a falha", obs: "" },
+                    { nome: "Flexão clássica", series: "3", reps: "Até a falha", obs: "" },
+                    { nome: "Flexão Declinada", series: "3", reps: "Até a falha", obs: "" }
+                ]
+            },
+            {
+                dia: "Sábado: Cardio Leve",
+                exercicios: [{ nome: "Corrida (10 min)", series: "2 Ciclos", reps: "5 min cada", obs: "5 min corre / 90 seg descansa / 5 min corre." }]
+            }
+        ]
+    },
+    {
+        id: "plano_4_velha_guarda",
+        titulo: "4. Pessoas Mais Velhas (40 a 55 anos)",
+        perfil: "Maturidade / Saúde",
+        objetivo: "Manutenção de massa magra e prevenção de sarcopenia.",
+        frequencia: "3x por semana",
+        descanso: "2 minutos",
+        rotinas: [
+            {
+                dia: "Segunda-feira: Peito, Tríceps e Ombros",
+                exercicios: [
+                    { nome: "Flexão clássica", series: "3", reps: "8-15 rep.", obs: "Joelhos no chão se necessário." },
+                    { nome: "Flexão inclinada", series: "3", reps: "8-15 rep.", obs: "" },
+                    { nome: "Flexão militar", series: "3", reps: "8-12 rep.", obs: "" },
+                    { nome: "Flexão diamante", series: "3", reps: "6-12 rep.", obs: "Joelhos no chão se necessário." },
+                    { nome: "Tríceps no banco", series: "3", reps: "10-20 rep.", obs: "" }
+                ]
+            },
+            {
+                dia: "Terça-feira: Costas e Bíceps",
+                exercicios: [
+                    { nome: "Barra australiana pronada aberta", series: "3", reps: "8-15 rep.", obs: "" },
+                    { nome: "Barra australiana pronada", series: "3", reps: "8-15 rep.", obs: "" },
+                    { nome: "Barra australiana supinada fechada", series: "3", reps: "8-15 rep.", obs: "" },
+                    { nome: "Barra australiana supinada", series: "3", reps: "8-15 rep.", obs: "" }
+                ]
+            },
+            {
+                dia: "Quarta-feira: Cardio Leve",
+                exercicios: [{ nome: "Corrida", series: "2 Ciclos", reps: "5 min", obs: "5 min corre / 2 min descansa / 5 min corre." }]
+            },
+            {
+                dia: "Quinta-feira: Pernas e Abdômen",
+                exercicios: [
+                    { nome: "Agachamento explosivo", series: "3", reps: "10-15 rep.", obs: "" },
+                    { nome: "Agachamento búlgaro", series: "3", reps: "10-15 por lado", obs: "" },
+                    { nome: "Agachamento livre", series: "3", reps: "20-30 rep.", obs: "" },
+                    { nome: "Abdominal", series: "3", reps: "20-30 rep.", obs: "" },
+                    { nome: "Canoa isométrica", series: "3", reps: "40-60 seg.", obs: "" },
+                    { nome: "Prancha isométrica", series: "3", reps: "40-60 seg.", obs: "" }
+                ]
+            },
+            {
+                dia: "Sexta-feira: HIIT Leve",
+                exercicios: [{ nome: "HIIT", series: "2 ciclos", reps: "Intenso", obs: "2 min de descanso entre ciclos." }]
+            }
+        ]
+    },
+    {
+        id: "plano_5_pouco_tempo",
+        titulo: "5. Pessoas com Pouco Tempo (20-30 min)",
+        perfil: "Eficiência / Circuito",
+        objetivo: "Densidade alta com exercícios compostos e pouco descanso.",
+        frequencia: "5-6x por semana",
+        descanso: "20-40s entre exs / 90s entre ciclos",
+        rotinas: [
+            {
+                dia: "Segunda-feira: Peito, Tríceps e Ombros",
+                exercicios: [
+                    { nome: "Circuito (3 voltas)", series: "-", reps: "-", obs: "Flexão Clás. / Decl. / Dips / Tríceps Banco / Pike." }
+                ]
+            },
+            {
+                dia: "Terça-feira: Costas e Bíceps",
+                exercicios: [
+                    { nome: "Circuito (3 voltas)", series: "-", reps: "-", obs: "Barra Fixa Aberta / Pronada / Fechada / Australiana Supinada." }
+                ]
+            },
+            {
+                dia: "Quinta-feira: Pernas e Abdômen",
+                exercicios: [
+                    { nome: "Circuito (3 voltas)", series: "-", reps: "-", obs: "Agach. Explosivo / Búlgaro / Livre / Cadeira / Canoa / Abdominal." }
+                ]
+            },
+            {
+                dia: "Sexta-feira: Costas e Peito",
+                exercicios: [
+                    { nome: "Circuito (3 voltas)", series: "-", reps: "-", obs: "Flexão Clás. / Decl. / Australiana Aberta / Pronada / Fechada." }
+                ]
+            },
+            {
+                dia: "Sábado: HIIT Leve",
+                exercicios: [{ nome: "HIIT", series: "2 ciclos", reps: "Varia", obs: "1 minuto de descanso." }]
+            }
+        ]
+    },
+    {
+        id: "plano_6_hipertrofia_pura",
+        titulo: "6. Só Ganhar Massa Muscular (Hipertrofia Pura)",
+        perfil: "Bodybuilding / Calistenia",
+        objetivo: "Volume e intensidade otimizados para construção muscular.",
+        frequencia: "4x por semana",
+        descanso: "2 minutos",
+        rotinas: [
+            {
+                dia: "Segunda-feira: Peito, Tríceps e Ombros",
+                exercicios: [
+                    { nome: "Flexão clássica", series: "3", reps: "Até a falha", obs: "" },
+                    { nome: "Flexão Declinada", series: "3", reps: "Até a falha", obs: "" },
+                    { nome: "Flexão inclinada", series: "3", reps: "Até a falha", obs: "" },
+                    { nome: "Dips na cadeira", series: "3", reps: "8-15 rep.", obs: "" },
+                    { nome: "Tríceps no banco", series: "3", reps: "Até a falha", obs: "" },
+                    { nome: "Flexão Pike", series: "3", reps: "8-12 rep.", obs: "" }
+                ]
+            },
+            {
+                dia: "Terça-feira: Costas e Bíceps",
+                exercicios: [
+                    { nome: "Barra fixa pronada aberta", series: "3", reps: "6-10 rep.", obs: "" },
+                    { nome: "Barra fixa pronada", series: "3", reps: "6-10 rep.", obs: "" },
+                    { nome: "Barra fixa pronada fechada", series: "3", reps: "6-10 rep.", obs: "" },
+                    { nome: "Barra fixa supinada", series: "3", reps: "6-10 rep.", obs: "" },
+                    { nome: "Barra australiana supinada fechada", series: "3", reps: "Até a falha", obs: "" }
+                ]
+            },
+            {
+                dia: "Quarta-feira: Cardio Leve",
+                exercicios: [{ nome: "Corrida (10 min)", series: "2 ciclos", reps: "5 min", obs: "90s descanso." }]
+            },
+            {
+                dia: "Quinta-feira: Pernas e Abdômen",
+                exercicios: [
+                    { nome: "Agachamento explosivo", series: "3", reps: "60 segundos", obs: "" },
+                    { nome: "Agachamento búlgaro", series: "3", reps: "10-15 por lado", obs: "" },
+                    { nome: "Agachamento livre", series: "3", reps: "15-25 rep.", obs: "" },
+                    { nome: "Cadeira isométrica", series: "3", reps: "40-60 seg.", obs: "" },
+                    { nome: "Abdominal", series: "3", reps: "20-30 rep.", obs: "" },
+                    { nome: "Abdominal infra", series: "3", reps: "12-18 rep.", obs: "" },
+                    { nome: "Canoa isométrica", series: "3", reps: "60 segundos", obs: "" }
+                ]
+            },
+            {
+                dia: "Sexta-feira: Costas e Peito",
+                exercicios: [
+                    { nome: "Barra fixa pronada aberta", series: "3", reps: "Até a falha", obs: "" },
+                    { nome: "Barra fixa pronada", series: "3", reps: "Até a falha", obs: "" },
+                    { nome: "Flexão clássica", series: "3", reps: "Até a falha", obs: "" },
+                    { nome: "Flexão Declinada", series: "3", reps: "Até a falha", obs: "" }
+                ]
+            },
+            {
+                dia: "Sábado: HIIT leve",
+                exercicios: [{ nome: "HIIT", series: "2 ciclos", reps: "Intenso", obs: "1 min de descanso." }]
+            }
+        ]
+    }
+);
+/* ============================================================
+   MÓDULO DE TREINO ESTOICO - PARTE 3: INTERFACE (HTML)
+   ============================================================ */
+
+function renderizarTreinos() {
+    const container = document.getElementById('view-treino');
+    
+    container.innerHTML = `
+        <h2 class="gold center">FORJA DE CORPO</h2>
+        <p class="small center" style="margin-bottom: 20px;">"Nenhum homem tem o direito de ser um amador no treinamento físico."</p>
+
+        <div class="card" style="border: 2px solid var(--cor-ouro); text-align: center; background: #000;">
+            <p class="gold small" style="letter-spacing: 2px;">TEMPO DE COMBATE</p>
+            <div id="cronometro-display" style="font-size: 3rem; font-family: monospace; color: #fff; margin: 10px 0;">00:00</div>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button onclick="gerenciarCronometro('start')" class="btn-guerreiro" style="width: auto; padding: 10px 20px; background: var(--cor-sucesso); box-shadow: none;">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button onclick="gerenciarCronometro('pause')" class="btn-guerreiro" style="width: auto; padding: 10px 20px; background: #555; box-shadow: none;">
+                    <i class="fas fa-pause"></i>
+                </button>
+                <button onclick="gerenciarCronometro('reset')" class="btn-guerreiro" style="width: auto; padding: 10px 20px; background: var(--cor-perigo); box-shadow: none;">
+                    <i class="fas fa-undo"></i>
+                </button>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 5px; margin-bottom: 20px;">
+            <button id="btn-tab-prontos" onclick="mudarTabTreino('prontos')" class="btn-guerreiro" style="font-size: 0.7rem; flex: 1;">
+                <i class="fas fa-scroll"></i> Planos Elite
+            </button>
+            <button id="btn-tab-forja" onclick="mudarTabTreino('forja')" class="btn-guerreiro" style="font-size: 0.7rem; flex: 1; background: #333; box-shadow: none;">
+                <i class="fas fa-hammer"></i> Minha Forja
+            </button>
+        </div>
+
+        <div id="conteudo-treino-dinamico">
+            </div>
+    `;
+
+    // Inicializa na aba de planos prontos
+    mudarTabTreino('prontos');
+}
+
+// Estilos extras específicos para o treino que não estavam no CSS original
+const styleTreino = document.createElement('style');
+styleTreino.innerHTML = `
+    .card-plano { 
+        border: 1px solid var(--borda-suave); 
+        padding: 15px; 
+        border-radius: 10px; 
+        margin-bottom: 15px;
+        transition: var(--transition);
+        background: var(--bg-card);
+    }
+    .badge-perfil {
+        background: var(--cor-ouro);
+        color: #000;
+        font-size: 0.6rem;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    .btn-dia-forja {
+        padding: 10px;
+        background: #222;
+        border: 1px solid #444;
+        color: #fff;
+        border-radius: 5px;
+        text-align: left;
+        margin-bottom: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .dia-ativo { border-color: var(--cor-ouro); background: rgba(212, 175, 55, 0.1); }
+`;
+document.head.appendChild(styleTreino);
+/* ============================================================
+   MÓDULO DE TREINO ESTOICO - PARTE 4: VITRINE E TRAVA PRO
+   ============================================================ */
+
+function mudarTabTreino(tab) {
+    const btnProntos = document.getElementById('btn-tab-prontos');
+    const btnForja = document.getElementById('btn-tab-forja');
+    const display = document.getElementById('conteudo-treino-dinamico');
+
+    if (tab === 'prontos') {
+        btnProntos.style.background = 'var(--cor-ouro)';
+        btnProntos.style.color = '#000';
+        btnForja.style.background = '#333';
+        btnForja.style.color = '#fff';
+        renderizarVitrinePlanos();
+    } else {
+        btnForja.style.background = 'var(--cor-ouro)';
+        btnForja.style.color = '#000';
+        btnProntos.style.background = '#333';
+        btnProntos.style.color = '#fff';
+        renderizarEstruturaForja();
+    }
+}
+
+function renderizarVitrinePlanos() {
+    const display = document.getElementById('conteudo-treino-dinamico');
+    let html = `<div style="animation: slideUp 0.3s ease;">`;
+
+    PLANOS_DE_TREINO.forEach((plano, index) => {
+        html += `
+            <div class="card card-plano" onclick="abrirDetalhesPlano(${index})">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                    <span class="badge-perfil">${plano.perfil}</span>
+                    ${!db.usuario.isPro ? '<i class="fas fa-lock gold"></i>' : '<i class="fas fa-chevron-right gold"></i>'}
+                </div>
+                <h4 class="gold">${plano.titulo}</h4>
+                <p class="small" style="margin-top: 5px;">${plano.objetivo}</p>
+                <div style="margin-top: 10px; font-size: 0.65rem; color: var(--cor-ouro);">
+                    <i class="fas fa-calendar-day"></i> ${plano.frequencia}
+                </div>
+            </div>
+        `;
+    });
+
+    html += `</div>`;
+    display.innerHTML = html;
+}
+
+function abrirDetalhesPlano(index) {
+    if (!db.usuario.isPro) {
+        verificarAcessoProTreino();
+        return;
+    }
+    
+    // Se for PRO, renderiza os detalhes do plano (Parte 5)
+    renderizarDetalhesPlanoEfetivo(index);
+}
+
+function verificarAcessoProTreino() {
+    const id = db.usuario.idInstalacao;
+    const msg = `🏛️ ACESSO À ELITE\n\nEstes planos detalhados são exclusivos para Guerreiros PRO.\n\nSEU ID: ${id}\n\nDeseja obter sua chave de acesso agora?`;
+    
+    if (confirm(msg)) {
+        window.open('https://pay.kiwify.com.br/xNy973L', '_blank');
+    }
+}
+
+// 5. LÓGICA DO CRONÔMETRO (DISPONÍVEL PARA TODOS)
+let tempoSegundos = 0;
+let cronAtivo = null;
+
+function gerenciarCronometro(acao) {
+    const display = document.getElementById('cronometro-display');
+    
+    if (acao === 'start') {
+        if (cronAtivo) return;
+        cronAtivo = setInterval(() => {
+            tempoSegundos++;
+            const m = Math.floor(tempoSegundos / 60).toString().padStart(2, '0');
+            const s = (tempoSegundos % 60).toString().padStart(2, '0');
+            display.innerText = `${m}:${s}`;
+        }, 1000);
+    } else if (acao === 'pause') {
+        clearInterval(cronAtivo);
+        cronAtivo = null;
+    } else if (acao === 'reset') {
+        clearInterval(cronAtivo);
+        cronAtivo = null;
+        tempoSegundos = 0;
+        display.innerText = "00:00";
+    }
+}
+/* ============================================================
+   MÓDULO DE TREINO ESTOICO - PARTE 5: DETALHES DO PLANO (PRO)
+   ============================================================ */
+
+function renderizarDetalhesPlanoEfetivo(index) {
+    const plano = PLANOS_DE_TREINO[index];
+    const display = document.getElementById('conteudo-treino-dinamico');
+
+    let html = `
+        <div style="animation: slideRight 0.3s ease;">
+            <button onclick="renderizarVitrinePlanos()" class="btn-guerreiro" style="width: auto; background: #333; margin-bottom: 15px; font-size: 0.7rem;">
+                <i class="fas fa-arrow-left"></i> Voltar à Vitrine
+            </button>
+            
+            <div class="card" style="border-top: 4px solid var(--cor-ouro);">
+                <h3 class="gold">${plano.titulo}</h3>
+                <p class="small" style="margin: 10px 0;"><strong>Objetivo:</strong> ${plano.objetivo}</p>
+                <p class="small"><strong>Descanso:</strong> ${plano.descanso}</p>
+            </div>
+    `;
+
+    plano.rotinas.forEach(rotina => {
+        html += `
+            <div style="margin-top: 20px;">
+                <h4 class="gold" style="border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 10px;">
+                    <i class="fas fa-fist-raised"></i> ${rotina.dia}
+                </h4>
+        `;
+
+        rotina.exercicios.forEach(ex => {
+            html += `
+                <div class="card" style="margin-bottom: 10px; padding: 12px; border-left: 3px solid var(--cor-ouro);">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: bold; color: #fff; font-size: 0.9rem;">${ex.nome}</span>
+                        <span class="gold" style="font-size: 0.8rem; font-weight: bold;">${ex.series} x ${ex.reps}</span>
+                    </div>
+                    ${ex.obs ? `<p class="small" style="font-size: 0.7rem; color: #888; margin-top: 5px;">${ex.obs}</p>` : ''}
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+    });
+
+    html += `
+            <div class="card" style="background: rgba(212,175,55,0.1); border: 1px dashed var(--cor-ouro); margin-top: 30px;">
+                <p class="small center italic">"O corpo é a ferramenta da mente. Mantenha-a afiada."</p>
+            </div>
+        </div>
+    `;
+
+    display.innerHTML = html;
+    document.getElementById('main-scroll-container').scrollTop = 0;
+}
+
+// Estilo de animação para transição suave
+const styleAnim = document.createElement('style');
+styleAnim.innerHTML = `
+    @keyframes slideRight {
+        from { opacity: 0; transform: translateX(-20px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+`;
+document.head.appendChild(styleAnim);
+/* ============================================================
+   MÓDULO DE TREINO ESTOICO - PARTE 6: ESTRUTURA DA FORJA
+   ============================================================ */
+
+// Garante que o objeto de treino personalizado exista no banco
+if (!db.treinos.personalizado) {
+    db.treinos.personalizado = {
+        descricao: "",
+        semana: {
+            "Segunda": { musculo: "Não definido", exercicios: [] },
+            "Terça": { musculo: "Não definido", exercicios: [] },
+            "Quarta": { musculo: "Não definido", exercicios: [] },
+            "Quinta": { musculo: "Não definido", exercicios: [] },
+            "Sexta": { musculo: "Não definido", exercicios: [] },
+            "Sábado": { musculo: "Não definido", exercicios: [] },
+            "Domingo": { musculo: "Não definido", exercicios: [] }
+        }
+    };
+}
+
+function renderizarEstruturaForja() {
+    const display = document.getElementById('conteudo-treino-dinamico');
+    const treinoP = db.treinos.personalizado;
+
+    let html = `
+        <div style="animation: slideUp 0.3s ease;">
+            <div class="card" style="border-left: 5px solid var(--cor-ouro);">
+                <h4 class="gold"><i class="fas fa-pen-nib"></i> Identidade do Plano</h4>
+                <p class="small">Dê um nome ou descreva sua meta (ex: Projeto Verão, Foco em Força...)</p>
+                <textarea id="desc-plano-input" onchange="salvarDescricaoForja()" 
+                    placeholder="Sua estratégia de guerra..." 
+                    style="width: 100%; background: #111; color: #fff; border: 1px solid #333; border-radius: 5px; padding: 10px; margin-top: 10px; font-family: sans-serif; resize: none;">${treinoP.descricao || ''}</textarea>
+            </div>
+
+            <h4 class="gold" style="margin: 20px 0 10px 0;"><i class="fas fa-calendar-alt"></i> Cronograma Semanal</h4>
+            <div id="lista-dias-forja">
+    `;
+
+    const dias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
+
+    dias.forEach(dia => {
+        const infoDia = treinoP.semana[dia];
+        const temTreino = infoDia.exercicios.length > 0;
+
+        html += `
+            <div class="btn-dia-forja ${temTreino ? 'dia-ativo' : ''}" onclick="abrirEditorDia('${dia}')">
+                <div>
+                    <strong style="color: var(--cor-ouro);">${dia}</strong><br>
+                    <span class="small" style="font-size: 0.7rem;">${infoDia.musculo}</span>
+                </div>
+                <div style="text-align: right;">
+                    <span class="small" style="display: block; font-size: 0.6rem;">${infoDia.exercicios.length} exs</span>
+                    <i class="fas fa-edit gold"></i>
+                </div>
+            </div>
+        `;
+    });
+
+    html += `
+            </div>
+            <div class="card" style="margin-top: 20px; background: rgba(255,255,255,0.05);">
+                <p class="small center">Clique no dia para definir o grupo muscular e os exercícios.</p>
+            </div>
+        </div>
+    `;
+
+    display.innerHTML = html;
+}
+
+function salvarDescricaoForja() {
+    const texto = document.getElementById('desc-plano-input').value;
+    db.treinos.personalizado.descricao = texto;
+    salvarDB();
+}
+/* ============================================================
+   MÓDULO DE TREINO ESTOICO - PARTE 7: EDITOR DO DIA E GRUPO MUSCULAR
+   ============================================================ */
+
+function abrirEditorDia(dia) {
+    const display = document.getElementById('conteudo-treino-dinamico');
+    const infoDia = db.treinos.personalizado.semana[dia];
+
+    let html = `
+        <div style="animation: slideRight 0.3s ease;">
+            <button onclick="renderizarEstruturaForja()" class="btn-guerreiro" style="width: auto; background: #333; margin-bottom: 15px; font-size: 0.7rem;">
+                <i class="fas fa-arrow-left"></i> Voltar ao Cronograma
+            </button>
+
+            <div class="card" style="border-top: 4px solid var(--cor-ouro);">
+                <h3 class="gold">${dia}</h3>
+                <p class="small">Defina o foco do treinamento para este dia.</p>
+                
+                <select id="select-musculo-dia" onchange="salvarMusculoDia('${dia}')" 
+                    style="width: 100%; padding: 12px; background: #111; color: var(--cor-ouro); border: 1px solid var(--cor-ouro); border-radius: 5px; margin-top: 10px; font-weight: bold;">
+                    <option value="Descanso" ${infoDia.musculo === 'Descanso' ? 'selected' : ''}>❄️ Descanso / Off</option>
+                    <option value="Peito e Tríceps" ${infoDia.musculo === 'Peito e Tríceps' ? 'selected' : ''}>💪 Peito e Tríceps</option>
+                    <option value="Costas e Bíceps" ${infoDia.musculo === 'Costas e Bíceps' ? 'selected' : ''}>🦅 Costas e Bíceps</option>
+                    <option value="Pernas" ${infoDia.musculo === 'Pernas' ? 'selected' : ''}>🦵 Pernas</option>
+                    <option value="Ombros e Core" ${infoDia.musculo === 'Ombros e Core' ? 'selected' : ''}>🛡️ Ombros e Core</option>
+                    <option value="Full Body" ${infoDia.musculo === 'Full Body' ? 'selected' : ''}>🦾 Full Body (Corpo Todo)</option>
+                    <option value="Cardio / HIIT" ${infoDia.musculo === 'Cardio / HIIT' ? 'selected' : ''}>🏃 Cardio / HIIT</option>
+                    <option value="Personalizado" ${infoDia.musculo === 'Personalizado' ? 'selected' : ''}>⚙️ Outro / Personalizado</option>
+                </select>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px 0;">
+                <h4 class="gold"><i class="fas fa-dumbbell"></i> Exercícios</h4>
+                <button onclick="abrirModalNovoExercicio('${dia}')" class="btn-guerreiro" style="width: auto; padding: 5px 15px; font-size: 0.65rem;">
+                    <i class="fas fa-plus"></i> ADICIONAR
+                </button>
+            </div>
+
+            <div id="lista-exercicios-dia">
+                ${renderizarExerciciosDoDia(dia)}
+            </div>
+        </div>
+    `;
+
+    display.innerHTML = html;
+    document.getElementById('main-scroll-container').scrollTop = 0;
+}
+
+function salvarMusculoDia(dia) {
+    const valor = document.getElementById('select-musculo-dia').value;
+    db.treinos.personalizado.semana[dia].musculo = valor;
+    salvarDB();
+}
+
+function renderizarExerciciosDoDia(dia) {
+    const exercicios = db.treinos.personalizado.semana[dia].exercicios;
+    if (exercicios.length === 0) {
+        return `<p class="small center" style="padding: 20px; color: #666;">Nenhum exercício forjado para este dia.</p>`;
+    }
+
+    let html = '';
+    exercicios.forEach((ex, index) => {
+        html += `
+            <div class="card" style="margin-bottom: 10px; padding: 12px; border-left: 3px solid var(--cor-ouro); display: flex; justify-content: space-between; align-items: center;">
+                <div style="flex: 1;">
+                    <span style="font-weight: bold; color: #fff; font-size: 0.9rem;">${ex.nome}</span><br>
+                    <span class="gold" style="font-size: 0.75rem;">${ex.series} x ${ex.reps}</span>
+                </div>
+                <div style="display: flex; gap: 15px;">
+                    <i class="fas fa-edit" style="color: #888;" onclick="editarExercicio('${dia}', ${index})"></i>
+                    <i class="fas fa-trash-alt" style="color: var(--cor-perigo);" onclick="removerExercicio('${dia}', ${index})"></i>
+                </div>
+            </div>
+        `;
+    });
+    return html;
+}
+/* ============================================================
+   MÓDULO DE TREINO ESTOICO - PARTE 8: SOBREPOSIÇÃO DE CRIAÇÃO
+   ============================================================ */
+
+function abrirModalNovoExercicio(dia) {
+    // Cria um elemento de overlay para a entrada de dados
+    const overlay = document.createElement('div');
+    overlay.id = "overlay-exercicio";
+    overlay.style = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.95); z-index: 9999;
+        display: flex; flex-direction: column; padding: 20px;
+        animation: fadeIn 0.3s ease;
+    `;
+
+    overlay.innerHTML = `
+        <h3 class="gold center" style="margin-top: 40px;">FORJAR EXERCÍCIO</h3>
+        <p class="small center">Adicionando ao plano de ${dia}</p>
+
+        <div style="margin-top: 30px;">
+            <label class="gold small">Nome do Exercício:</label>
+            <input type="text" id="new-ex-nome" placeholder="Ex: Flexão de Braço" 
+                style="width: 100%; padding: 12px; background: #222; border: 1px solid #444; color: #fff; border-radius: 5px; margin-bottom: 15px;">
+
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <div style="flex: 1;">
+                    <label class="gold small">Séries:</label>
+                    <input type="number" id="new-ex-series" placeholder="3" 
+                        style="width: 100%; padding: 12px; background: #222; border: 1px solid #444; color: #fff; border-radius: 5px;">
+                </div>
+                <div style="flex: 1;">
+                    <label class="gold small">Reps / Tempo:</label>
+                    <input type="text" id="new-ex-reps" placeholder="12 ou 40s" 
+                        style="width: 100%; padding: 12px; background: #222; border: 1px solid #444; color: #fff; border-radius: 5px;">
+                </div>
+            </div>
+
+            <button onclick="salvarNovoExercicio('${dia}')" class="btn-guerreiro" style="margin-bottom: 10px;">
+                <i class="fas fa-check"></i> CONFIRMAR E SALVAR
+            </button>
+            <button onclick="fecharOverlayExercicio()" class="btn-guerreiro" style="background: #333; box-shadow: none;">
+                CANCELAR
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+}
+
+function fecharOverlayExercicio() {
+    const overlay = document.getElementById('overlay-exercicio');
+    if (overlay) overlay.remove();
+}
+
+function salvarNovoExercicio(dia) {
+    const nome = document.getElementById('new-ex-nome').value;
+    const series = document.getElementById('new-ex-series').value || "1";
+    const reps = document.getElementById('new-ex-reps').value || "10";
+
+    if (!nome) {
+        alert("Dê um nome ao exercício, guerreiro!");
+        return;
+    }
+
+    const novoEx = { nome, series, reps };
+    
+    // Adiciona ao banco de dados
+    db.treinos.personalizado.semana[dia].exercicios.push(novoEx);
+    salvarDB();
+    
+    // Fecha e recarrega a vista do dia
+    fecharOverlayExercicio();
+    abrirEditorDia(dia);
+}
+/* ============================================================
+   MÓDULO DE TREINO ESTOICO - PARTE 9: EDIÇÃO E EXCLUSÃO
+   ============================================================ */
+
+function removerExercicio(dia, index) {
+    const confirmacao = confirm("Deseja remover este exercício da sua forja?");
+    if (confirmacao) {
+        db.treinos.personalizado.semana[dia].exercicios.splice(index, 1);
+        salvarDB();
+        abrirEditorDia(dia); // Recarrega a lista
+    }
+}
+
+function editarExercicio(dia, index) {
+    const ex = db.treinos.personalizado.semana[dia].exercicios[index];
+
+    // Reutilizamos a estrutura do overlay, mas com os dados preenchidos
+    const overlay = document.createElement('div');
+    overlay.id = "overlay-exercicio";
+    overlay.style = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.95); z-index: 9999;
+        display: flex; flex-direction: column; padding: 20px;
+        animation: fadeIn 0.3s ease;
+    `;
+
+    overlay.innerHTML = `
+        <h3 class="gold center" style="margin-top: 40px;">EDITAR EXERCÍCIO</h3>
+        <p class="small center">Ajustando sua ferramenta de treino</p>
+
+        <div style="margin-top: 30px;">
+            <label class="gold small">Nome do Exercício:</label>
+            <input type="text" id="edit-ex-nome" value="${ex.nome}" 
+                style="width: 100%; padding: 12px; background: #222; border: 1px solid #444; color: #fff; border-radius: 5px; margin-bottom: 15px;">
+
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <div style="flex: 1;">
+                    <label class="gold small">Séries:</label>
+                    <input type="number" id="edit-ex-series" value="${ex.series}" 
+                        style="width: 100%; padding: 12px; background: #222; border: 1px solid #444; color: #fff; border-radius: 5px;">
+                </div>
+                <div style="flex: 1;">
+                    <label class="gold small">Reps / Tempo:</label>
+                    <input type="text" id="edit-ex-reps" value="${ex.reps}" 
+                        style="width: 100%; padding: 12px; background: #222; border: 1px solid #444; color: #fff; border-radius: 5px;">
+                </div>
+            </div>
+
+            <button onclick="salvarEdicaoExercicio('${dia}', ${index})" class="btn-guerreiro" style="margin-bottom: 10px; background: var(--cor-sucesso);">
+                <i class="fas fa-save"></i> SALVAR ALTERAÇÕES
+            </button>
+            <button onclick="fecharOverlayExercicio()" class="btn-guerreiro" style="background: #333; box-shadow: none;">
+                CANCELAR
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+}
+
+function salvarEdicaoExercicio(dia, index) {
+    const nome = document.getElementById('edit-ex-nome').value;
+    const series = document.getElementById('edit-ex-series').value;
+    const reps = document.getElementById('edit-ex-reps').value;
+
+    if (!nome) {
+        alert("O exercício precisa de um nome!");
+        return;
+    }
+
+    // Atualiza o objeto no banco
+    db.treinos.personalizado.semana[dia].exercicios[index] = { nome, series, reps };
+    salvarDB();
+    
+    fecharOverlayExercicio();
+    abrirEditorDia(dia);
+}
+/* ============================================================
+   MÓDULO DE TREINO ESTOICO - PARTE 10: UTILITÁRIOS E COMPARTILHAMENTO
+   ============================================================ */
+
+function compartilharTreinoPersonalizado() {
+    const treinoP = db.treinos.personalizado;
+    let mensagem = `⚔️ *MEU PLANO DE GUERRA - VOXFLOW* ⚔️\n\n`;
+    
+    if (treinoP.descricao) {
+        mensagem += `*Estratégia:* ${treinoP.descricao}\n\n`;
+    }
+
+    const dias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
+    
+    dias.forEach(dia => {
+        const info = treinoP.semana[dia];
+        if (info.exercicios.length > 0 || info.musculo !== "Não definido") {
+            mensagem += `*${dia.toUpperCase()}* (${info.musculo})\n`;
+            info.exercicios.forEach(ex => {
+                mensagem += `- ${ex.nome}: ${ex.series}x ${ex.reps}\n`;
+            });
+            mensagem += `\n`;
+        }
+    });
+
+    mensagem += `_Forjado no aplicativo VoxFlow_`;
+
+    const urlCodificada = encodeURIComponent(mensagem);
+    window.open(`https://api.whatsapp.com/send?text=${urlCodificada}`, '_blank');
+}
+
+function resetarForjaInteira() {
+    const confirmacao = confirm("ATENÇÃO: Isso apagará TODO o seu plano personalizado. Deseja continuar?");
+    
+    if (confirmacao) {
+        db.treinos.personalizado = {
+            descricao: "",
+            semana: {
+                "Segunda": { musculo: "Não definido", exercicios: [] },
+                "Terça": { musculo: "Não definido", exercicios: [] },
+                "Quarta": { musculo: "Não definido", exercicios: [] },
+                "Quinta": { musculo: "Não definido", exercicios: [] },
+                "Sexta": { musculo: "Não definido", exercicios: [] },
+                "Sábado": { musculo: "Não definido", exercicios: [] },
+                "Domingo": { musculo: "Não definido", exercicios: [] }
+            }
+        };
+        salvarDB();
+        renderizarEstruturaForja();
+    }
+}
+
+// Adiciona botões de ação no final da lista da forja (atualizando a função da Parte 6)
+const originalRenderizarForja = renderizarEstruturaForja;
+renderizarEstruturaForja = function() {
+    originalRenderizarForja();
+    const display = document.getElementById('conteudo-treino-dinamico');
+    
+    const botoesAcao = `
+        <div style="display: flex; gap: 10px; margin-top: 30px; margin-bottom: 50px;">
+            <button onclick="compartilharTreinoPersonalizado()" class="btn-guerreiro" style="flex: 2; background: #25D366; border: none;">
+                <i class="fab fa-whatsapp"></i> COMPARTILHAR PLANO
+            </button>
+            <button onclick="resetarForjaInteira()" class="btn-guerreiro" style="flex: 1; background: var(--cor-perigo); box-shadow: none;">
+                <i class="fas fa-trash"></i> RESET
+            </button>
+        </div>
+    `;
+    display.innerHTML += botoesAcao;
+}
+/* ============================================================
+   MÓDULO DE TREINO ESTOICO - PARTE 11: REFINAMENTO ESTÉTICO (CSS)
+   ============================================================ */
+
+const cssTreinoFinal = document.createElement('style');
+cssTreinoFinal.innerHTML = `
+    /* Animações de Transição */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Estilização do Cronômetro */
+    #cronometro-display {
+        text-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        letter-spacing: 4px;
+        font-weight: bold;
+    }
+
+    /* Ajustes da Forja Personalizada */
+    .btn-dia-forja {
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-dia-forja:active {
+        transform: scale(0.98);
+        background: #222;
+    }
+
+    .dia-ativo::after {
+        content: '✓';
+        position: absolute;
+        right: 40px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--cor-sucesso);
+        font-weight: bold;
+    }
+
+    /* Estilo dos Inputs de Texto e Select */
+    #desc-plano-input:focus, #select-musculo-dia:focus {
+        border-color: var(--cor-ouro) !important;
+        outline: none;
+        box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+    }
+
+    /* Overlay de Exercício */
+    #overlay-exercicio input {
+        font-size: 16px; /* Evita zoom automático no iOS ao focar */
+    }
+
+    /* Lista de Exercícios Detalhada */
+    .item-exercicio-detalhe {
+        background: #111;
+        border: 1px solid #222;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 12px;
+    }
+`;
+document.head.appendChild(cssTreinoFinal);
+
+// Função auxiliar para scroll suave ao topo nas mudanças de tela
+function subirAoTopoTreino() {
+    const scrollContainer = document.getElementById('main-scroll-container');
+    if (scrollContainer) {
+        scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
+/* ============================================================
+   MÓDULO DE TREINO ESTOICO - PARTE 12: INICIALIZAÇÃO FINAL
+   ============================================================ */
+
+/**
+ * Inicializa o Módulo de Treinos.
+ * Esta função deve ser chamada quando o usuário clica na aba de Treino.
+ */
+function inicializarModuloTreino() {
+    // 1. Garantir que a estrutura de dados exista no banco local
+    if (!db.treinos) {
+        db.treinos = {
+            personalizado: {
+                descricao: "",
+                semana: {
+                    "Segunda": { musculo: "Não definido", exercicios: [] },
+                    "Terça": { musculo: "Não definido", exercicios: [] },
+                    "Quarta": { musculo: "Não definido", exercicios: [] },
+                    "Quinta": { musculo: "Não definido", exercicios: [] },
+                    "Sexta": { musculo: "Não definido", exercicios: [] },
+                    "Sábado": { musculo: "Não definido", exercicios: [] },
+                    "Domingo": { musculo: "Não definido", exercicios: [] }
+                }
+            }
+        };
+        salvarDB();
+    }
+
+    // 2. Renderizar a interface base (Cronômetro + Abas)
+    renderizarTreinos();
+    
+    // 3. Subir o scroll para o topo
+    subirAoTopoTreino();
+}
+
+// INTEGRAÇÃO COM O MENU PRINCIPAL:
+// Caso seu sistema use uma função central para trocar de tela (ex: showSection), 
+// certifique-se de que ao selecionar 'treino', a função inicializarModuloTreino() seja chamada.
+
+/* EXEMPLO DE USO NO SEU NAVEGADOR DE ABAS:
+   if (sectionId === 'view-treino') {
+       inicializarModuloTreino();
+   }
+*/
+
+console.log("⚔️ Módulo de Treinos VoxFlow carregado com sucesso.");
 </script>
 </body>
 </html>
