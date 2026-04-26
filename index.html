@@ -70,10 +70,16 @@
             flex-direction: column;
         }
 
-        /* BLOQUEIO DE INTERAÇÃO - PARTE 1 */
+        /* BLOQUEIO DE INTERAÇÃO - CORRIGIDO PARA PERMITIR SCROLL */
         body.app-travado #main-scroll-container {
-            pointer-events: none;
-            overflow: hidden;
+            pointer-events: none;    /* Bloqueia cliques */
+            touch-action: pan-y;     /* Permite o scroll vertical (gesto) */
+            overflow-y: auto;        /* Garante que o scroll vertical esteja ativo */
+        }
+        
+        /* CORREÇÃO CIRÚRGICA: Libera cliques na Muralha mesmo com app travado */
+        body.app-travado #view-bloqueio {
+            pointer-events: auto;
         }
 
         /* Container Principal (SPA) */
@@ -516,36 +522,43 @@
             <h2 class="gold center">Oficina do Guerreiro</h2>
             
             <div class="card" style="border: 1px solid var(--cor-ouro); background: rgba(212,175,55,0.05); text-align: center;">
-                <p class="small gold" style="text-transform: uppercase; margin-bottom: 5px;">Sua Identidade Digital</p>
-                
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 15px;">
-                    <div id="config-id-display" style="font-family: monospace; font-size: 1.2rem; color: #fff;">Aguardando...</div>
-                    <button class="btn-guerreiro" onclick="copiarID()" style="width: auto; padding: 5px 15px; font-size: 0.7rem; background: #333; box-shadow: none;">
-                        <i class="fas fa-copy"></i> COPIAR MEU ID
+                <div id="area-viri-pro">
+                    <p class="small gold" style="text-transform: uppercase; margin-bottom: 5px;">Sua Identidade Digital</p>
+                    
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 15px;">
+                        <div id="config-id-display" style="font-family: monospace; font-size: 1.2rem; color: #fff;">Aguardando...</div>
+                        <button class="btn-guerreiro" onclick="copiarID()" style="width: auto; padding: 5px 15px; font-size: 0.7rem; background: #333; box-shadow: none;">
+                            <i class="fas fa-copy"></i> COPIAR MEU ID
+                        </button>
+                    </div>
+                    
+                    <button class="btn-guerreiro" onclick="window.open('https://pay.kiwify.com.br/xNy973L', '_blank')" style="background: linear-gradient(45deg, #1A237E, #D4AF37); margin-bottom: 15px;">
+                        <i class="fas fa-crown"></i> 👑 TORNAR-SE PRO
                     </button>
-                </div>
-                
-                <button class="btn-guerreiro" onclick="window.open('https://pay.kiwify.com.br/xNy973L', '_blank')" style="background: linear-gradient(45deg, #1A237E, #D4AF37); margin-bottom: 15px;">
-                    <i class="fas fa-crown"></i> 👑 TORNAR-SE PRO
-                </button>
 
-                <div style="border-top: 1px solid #444; padding-top: 15px; margin-top: 5px;">
-                    <p class="small">Possui uma chave de ativação?</p>
-                    <input type="number" id="input-chave-config" class="input-ativacao" placeholder="Chave de 4 dígitos" style="margin: 10px 0; width: 80%;">
-                    <button class="btn-guerreiro" onclick="validarChaveDireta()" style="background: transparent; border: 1px solid var(--cor-ouro); color: var(--cor-ouro); font-size: 0.8rem; box-shadow: none;">
-                        LIBERAR ACESSO ELITE
-                    </button>
+                    <div style="border-top: 1px solid #444; padding-top: 15px; margin-top: 5px;">
+                        <p class="small">Possui uma chave de ativação?</p>
+                        <input type="number" id="input-chave-config" class="input-ativacao" placeholder="Chave de 4 dígitos" style="margin: 10px 0; width: 80%;">
+                        <button class="btn-guerreiro" onclick="validarChaveDireta()" style="background: transparent; border: 1px solid var(--cor-ouro); color: var(--cor-ouro); font-size: 0.8rem; box-shadow: none;">
+                            LIBERAR ACESSO ELITE
+                        </button>
+                    </div>
+                </div>
+
+                <div id="status-guerreiro-pro" style="display: none; padding: 20px 10px;">
+                    <div style="font-size: 2.5rem; margin-bottom: 10px;">🛡️</div>
+                    <h3 class="gold" style="letter-spacing: 2px; text-shadow: 0 0 10px rgba(212,175,55,0.5);">VOCÊ É UM GUERREIRO PRO</h3>
+                    <p class="small" style="color: #888; font-style: italic; margin-top: 5px;">Acesso vitalício à Elite Software Ferreira validado.</p>
                 </div>
             </div>
 
             <div class="card card-guerreiro">
-                <p class="gold small center" style="margin-bottom:10px;">⚔️ CÓDIGO DO GUERREIRO</p>
+                <p class="gold small center" style="margin-bottom:10px;">⚔️ SISTEMA DE BACKUP</p>
                 <button class="btn-guerreiro" onclick="exportarDadosTexto()" style="margin-bottom:10px;">
-                    <i class="fas fa-shield-virus"></i> Gerar Código de Honra
+                    <i class="fas fa-download"></i> Baixar Backup
                 </button>
-                <textarea id="input-backup-texto" style="width:100%; height:60px; background:#111; color:#ccc; border:1px solid #333;" placeholder="Cole aqui seu Código de Honra..."></textarea>
                 <button class="btn-guerreiro" onclick="importarDadosTexto()" style="background:#333; margin-top:10px;">
-                    <i class="fas fa-scroll"></i> Restaurar via Código
+                    <i class="fas fa-upload"></i> Restaurar via Arquivo
                 </button>
             </div>
         </section>
@@ -600,7 +613,7 @@
                 <i class="fas fa-book-open"></i>
             </button>
             <button class="btn-subir btn-3" onclick="navegar('proteina')">
-                <i class="fas fa-dumbbell"></i>
+                <i class="fas fa-mitten"></i>
             </button>
             <button class="btn-subir btn-4" onclick="navegar('financas')">
                 <i class="fas fa-sack-dollar"></i>
@@ -609,7 +622,7 @@
                 <i class="fas fa-bullseye"></i>
             </button>
             <button class="btn-subir btn-6" onclick="navegar('treino')">
-                <i class="fas fa-mitten"></i>
+                <i class="fas fa-dumbbell"></i>
             </button>
 
             <button class="btn-principal" onclick="toggleMenuExtra()">
@@ -627,7 +640,8 @@
             <i class="fas fa-crown"></i><span>Elite</span>
         </a>
     </nav>
-    <script>
+
+<script>
     // FUNÇÃO DE GATILHO DO MENU (ATUALIZADA PARA 6 BOTÕES)
     function toggleMenuExtra() {
         const menu = document.getElementById('menuExpansivel');
@@ -647,16 +661,12 @@
     }
 
     // Função auxiliar para fechar o menu automaticamente ao clicar em uma opção
-    // Isso evita que o leque de botões fique aberto em cima da nova tela
     function fecharMenuAposSelecao() {
         const menu = document.getElementById('menuExpansivel');
         if (menu.classList.contains('active')) {
             toggleMenuExtra();
         }
     }
-
-    // Hook para a função navegar (vamos conectar isso na Parte 3)
-    // Sempre que navegar for chamado, o menu fecha.
 </script>
 <script>
     /* ============================================================
@@ -665,23 +675,16 @@
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
-                .then(reg => {
-                    console.log('Escudo Offline Ativado!');
-                    reg.update(); // <--- FORÇA A BUSCA POR ATUALIZAÇÃO NO GITHUB
-                })
+                .then(reg => console.log('Escudo Offline Ativado!', reg))
                 .catch(err => console.log('Erro ao ativar escudo:', err));
         });
     }
 
-
     /* ============================================================
-       2. BANCO DE DADOS - ESTRUTURA COMPLETA (SOFTWARE FERREIRA)
+       2. BANCO DE DADOS - ESTRUTURA (SOFTWARE FERREIRA)
        ============================================================ */
     
     const DB_NOME = "SoftwareFerreira_CaminhoGuerreiro_v2";
-
-    const novoId = Math.floor(Math.random() * 9000) + 1000;
-    const dataAgora = Date.now();
 
     const dadosIniciais = {
         usuario: {
@@ -692,16 +695,17 @@
             streak: 0,
             totalConcluido: 0,
             ultimaVisita: new Date().toLocaleDateString('pt-BR'),
-            idInstalacao: novoId,
-            dataInstalacao: dataAgora,
-            isPro: false
+            idInstalacao: Math.floor(Math.random() * 9000) + 1000,
+            dataInstalacao: Date.now(),
+            isPro: false,
+            ebooksComprados: []
         },
         habitos: [
             { id: 1, nome: "Meditar ou Orar", desc: "5-10 min de introspecção", tipo: "check", cat: "Mente", diff: 1, freq: "fixo", xp: 20 },
             { id: 2, nome: "Leitura Estoica", desc: "Mínimo 10 min de sabedoria", tipo: "check", cat: "Mente", diff: 1, freq: "fixo", xp: 25 },
             { id: 3, nome: "Refletir sobre Metas", desc: "Escrever ou planejar o dia", tipo: "check", cat: "Mente", diff: 1, freq: "fixo", xp: 15 },
             { id: 4, nome: "Foco Total (Anti-Procrastinação)", desc: "Trabalho profissional sem distrações", tipo: "check", cat: "Mente", diff: 3, freq: "fixo", xp: 50 },
-            { id: 5, nome: "Hidratação Real", desc: "Beber 2.5L de água", tipo: "contador", meta: 5, progresso: 0, cat: "Corpo", diff: 1, freq: "fixo", xp: 30 },
+            { id: 5, nome: "Hidratação Real", desc: "Beber 2.5L de água", tipo: "check", cat: "Corpo", diff: 1, freq: "fixo", xp: 30 },
             { id: 6, nome: "Treino de Calistenia", desc: "Hipertrofia e força em casa", tipo: "check", cat: "Corpo", diff: 3, freq: "fixo", xp: 60 },
             { id: 7, nome: "Sono do Guerreiro", desc: "7-8 horas de descanso", tipo: "check", cat: "Corpo", diff: 1, freq: "fixo", xp: 20 },
             { id: 8, nome: "Alimentação Limpa", desc: "Evitar açúcar e ultraprocessados", tipo: "check", cat: "Corpo", diff: 2, freq: "fixo", xp: 40 },
@@ -736,8 +740,12 @@
             { id: 60, nome: "Forja da Alma", dias: 60, recompensa: 10000, ativo: false, progresso: 0, pro: true },
             { id: 90, nome: "Legado do Imperador", dias: 90, recompensa: 25000, ativo: false, progresso: 0, pro: true }
         ],
-        // NOVAS GAVETAS DO BANCO DE DADOS (Invisíveis e Seguras)
-        financas: { salarios: [], despesas: [], historico: {} },
+        financas: { 
+            salarios: [], 
+            despesas: [], 
+            historico: {},
+            metas: { necessario: 50, lazer: 30, legado: 20 } 
+        },
         metas: [],
         treinos: { planosProntos: [], personalizados: [] },
         diarioRetrospectiva: {},
@@ -746,23 +754,47 @@
         config: { tema: 'dark' }
     };
 
-    let db = JSON.parse(localStorage.getItem(DB_NOME)) || dadosIniciais;
+    let db;
 
-    // Garante que as novas gavetas existam se o usuário já tiver o app instalado
-    if(!db.financas) db.financas = dadosIniciais.financas;
-    if(!db.metas) db.metas = dadosIniciais.metas;
-    if(!db.treinos) db.treinos = dadosIniciais.treinos;
-    if(!db.diarioRetrospectiva) db.diarioRetrospectiva = dadosIniciais.diarioRetrospectiva;
-
-    if (!db.usuario.idInstalacao) {
-        db.usuario.idInstalacao = novoId;
-        db.usuario.dataInstalacao = dataAgora;
+    // Função de migração para manter compatibilidade com versões antigas
+    function migrarEstrutura() {
+        if(!db.financas) db.financas = { ...dadosIniciais.financas };
+        if(!db.financas.metas) db.financas.metas = { ...dadosIniciais.financas.metas };
+        if(!db.metas) db.metas = [];
+        if(!db.treinos) db.treinos = { ...dadosIniciais.treinos };
+        if(!db.diarioRetrospectiva) db.diarioRetrospectiva = {};
+        if(!db.usuario.ebooksComprados) db.usuario.ebooksComprados = [];
+        if(!db.usuario.idInstalacao) { db.usuario.idInstalacao = Math.floor(Math.random() * 9000) + 1000; }
+        if(!db.usuario.dataInstalacao) { db.usuario.dataInstalacao = Date.now(); }
+        if(db.usuario.isPro === undefined) db.usuario.isPro = false;
     }
-    if (db.usuario.isPro === undefined) db.usuario.isPro = false;
+
+    function carregarDB() {
+        const salvo = localStorage.getItem(DB_NOME);
+        if (salvo) {
+            try {
+                db = JSON.parse(salvo);
+                migrarEstrutura();
+            } catch (e) {
+                console.error("Erro no DB, resetando...", e);
+                db = { ...dadosIniciais };
+            }
+        } else {
+            db = { ...dadosIniciais };
+        }
+    }
 
     function salvarDB() {
         localStorage.setItem(DB_NOME, JSON.stringify(db));
     }
+
+    // Inicialização imediata
+    carregarDB();
+    salvarDB();
+
+    /* ============================================================
+       SISTEMAS DE SEGURANÇA E NAVEGAÇÃO
+       ============================================================ */
 
     function verificarBloqueio() {
         if (db.usuario.isPro) {
@@ -795,29 +827,18 @@
         });
     }
 
-    /* ============================================================
-       SISTEMA DE NAVEGAÇÃO ATUALIZADO (6 NOVAS FUNÇÕES)
-       ============================================================ */
     function navegar(telaId) {
         if (verificarBloqueio()) return;
-
-        // Fecha o menu expansível automaticamente ao navegar
         if(typeof fecharMenuAposSelecao === "function") fecharMenuAposSelecao();
 
-        document.querySelectorAll('.view-section').forEach(section => {
-            section.classList.remove('active');
-        });
-
+        document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
         const target = document.getElementById('view-' + telaId);
         if (target) target.classList.add('active');
 
-        document.querySelectorAll('.tab-item').forEach(tab => {
-            tab.classList.remove('active');
-        });
+        document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
         const activeTab = document.getElementById('tab-' + telaId);
         if (activeTab) activeTab.classList.add('active');
 
-        // Gatilhos de Renderização (Originais + Novos)
         if (telaId === 'home') renderizarHome();
         if (telaId === 'habitos') renderizarCRUD();
         if (telaId === 'valores') renderizarValores(); 
@@ -826,18 +847,16 @@
         if (telaId === 'premium') renderizarPremium();
         if (telaId === 'desafios') renderizarDesafios();
         
-        // Chamadas para as Novas Funções (Scripts que criaremos)
-        if (telaId === 'grafico') if(window.renderizarGraficos) renderizarGraficos();
-        if (telaId === 'diario') if(window.renderizarDiario) renderizarDiario();
-        if (telaId === 'proteina') if(window.renderizarCalculadora) renderizarCalculadora();
-        if (telaId === 'financas') if(window.renderizarFinancas) renderizarFinancas();
-        if (telaId === 'metas') if(window.renderizarMetas) renderizarMetas();
-        if (telaId === 'treino') if(window.renderizarTreinos) renderizarTreinos();
+        if (telaId === 'grafico' && window.renderizarGraficos) renderizarGraficos();
+        if (telaId === 'diario' && window.renderizarDiario) renderizarDiario();
+        if (telaId === 'proteina' && window.renderizarCalculadora) renderizarCalculadora();
+        if (telaId === 'financas') renderizarFinancas();
+        if (telaId === 'metas' && window.renderizarMetas) renderizarMetas();
+        if (telaId === 'treino' && window.renderizarTreinos) renderizarTreinos();
 
         if (telaId === 'config') {
             document.getElementById('config-id-display').innerText = db.usuario.idInstalacao;
         }
-
         document.getElementById('main-scroll-container').scrollTop = 0;
     }
 
@@ -883,18 +902,19 @@
         verificarBloqueio();
     }
 
-    const frasesGladiador = [
-        "A sorte favorece os destemidos, guerreiro.",
-        "Não é porque as coisas são difíceis que não ousamos; é porque não ousamos que elas são difíceis.",
-        "O homem que domina a si mesmo é o maior dos impérios.",
-        "Lembre-se: o obstáculo é o caminho.",
-        "O suor no treino poupa o sangue na batalha.",
-        "A disciplina é o fogo que forja o aço da sua alma.",
-        "Sua vontade deve ser mais forte que sua maior desculpa.",
-        "A excelência não é um ato, mas um hábito.",
-        "A queda não é o fim, a permanência no chão sim.",
-        "Um guerreiro não desiste do que ama, ele encontra amor no que faz.",
-        "A dor é o mensageiro da evolução.",
+    function atualizarFrase() {
+        const frasesGladiador = [
+            "A sorte favorece os destemidos, guerreiro.",
+            "Não é porque as coisas são difíceis que não ousamos; é porque não ousamos que elas são difíceis.",
+            "O homem que domina a si mesmo é o maior dos impérios.",
+            "Lembre-se: o obstáculo é o caminho.",
+            "O suor no treino poupa o sangue na batalha.",
+            "A disciplina é o fogo que forja o aço da sua alma.",
+            "Sua vontade deve ser mais forte que sua maior desculpa.",
+            "A excelência não é um ato, mas um hábito.",
+            "A queda não é o fim, a permanência no chão sim.",
+            "Um guerreiro não desiste do que ama, ele encontra amor no que faz.",
+            "A dor é o mensageiro da evolução.",
         "Não reze por uma vida fácil, reze por forças para suportar uma difícil.",
         "O guerreiro que treina na paz, não sangra na guerra.",
         "Seja como a água: adapte-se, mas nunca perca sua força.",
@@ -983,18 +1003,115 @@
         "A forja da alma nunca para.",
         "Seja um exemplo, não apenas uma opinião.",
         "O cansaço passa, o resultado permanece.",
-        "Siga o Caminho do Guerreiro até o fim."
-    ];
+        "Siga o Caminho do Guerreiro até o fim.",
+                "O descanso é apenas a preparação para o próximo ataque.",
+        "Não busque atalhos; busque maestria.",
+        "A sombra do guerreiro é sua maior aliada na reflexão.",
+        "Se o peso é grande, é porque você está ficando mais forte.",
+        "O amanhã começa com a decisão que você toma agora.",
+        "Mantenha a fé na rotina quando os resultados demorarem.",
+        "A derrota é o martelo que molda o vitorioso.",
+        "Sua vontade é o combustível; sua ação é o motor.",
+        "A glória é silenciosa para aqueles que a buscam de verdade.",
+        "Não é sorte, é preparo que encontra a ocasião.",
+        "Quem tem metas, não tem tempo para dúvidas.",
+        "A disciplina transforma o ordinário em extraordinário.",
+        "Ocupar a mente é a melhor defesa contra o caos.",
+        "A construção do seu legado não tem feriados.",
+        "A força física é apenas a manifestação da força mental.",
+        "O caminho é duro, mas o destino é inabalável.",
+        "Agradeça pelo obstáculo; ele é seu treinador.",
+        "A inércia é a inimiga mortal da evolução.",
+        "Sua melhor versão ainda está sendo construída.",
+        "Não negocie com o cansaço; negocie com a meta.",
+        "O foco corrige o curso da vida.",
+        "A cada repetição, um pedaço de fraqueza é deixado para trás.",
+        "A autoridade sobre si mesmo é o poder supremo.",
+        "Seja a lenda que você gostaria de ter conhecido.",
+        "A disciplina elimina a necessidade da motivação.",
+        "O sofrimento é opcional; o crescimento é obrigatório.",
+        "Sua armadura é sua ética.",
+        "Não guarde energia para o retorno; queime-a na missão.",
+        "O homem comum reclama; o guerreiro ajusta o plano.",
+        "O dia tem 24 horas; transforme cada minuto em valor.",
+        "Não julgue o esforço pelo resultado imediato.",
+        "A consistência é o batimento cardíaco do sucesso.",
+        "O objetivo não é ser melhor que o outro, mas ser melhor que ontem.",
+        "A resistência é a medida da sua verdade.",
+        "Um escudo firme protege uma mente clara.",
+        "Seja intransigente com seus princípios.",
+        "O topo não é o fim, é apenas o ponto de vista.",
+        "A vontade é o mestre; o corpo é o servo.",
+        "Limpe sua mente de desculpas baratas.",
+        "A sabedoria é o resultado de muitas falhas e persistência.",
+        "O tempo não para, então mova-se com ele.",
+        "A paz de espírito é o maior prêmio da disciplina.",
+        "Não permita que a média dite o seu limite.",
+        "O sacrifício é o preço da liberdade.",
+        "Forje sua vontade na bigorna da realidade.",
+        "Cada gota de suor é uma assinatura no livro da vitória.",
+        "O medo é apenas uma reação; a coragem é uma decisão.",
+        "Treine sua mente para ver oportunidades onde outros veem muros.",
+        "A constância separa os curiosos dos conquistadores.",
+        "O sucesso é a soma de pequenos esforços repetidos à exaustão."
 
-    function atualizarFrase() {
+        ];
         const el = document.getElementById('frase-gladiador');
-        if (el) {
-            el.innerText = `"${frasesGladiador[Math.floor(Math.random() * frasesGladiador.length)]}"`;
+        if (el) el.innerText = `"${frasesGladiador[Math.floor(Math.random() * frasesGladiador.length)]}"`;
+    }
+
+    /* ============================================================
+       3. MÓDULO FINANCEIRO
+       ============================================================ */
+    function renderizarFinancas() {
+        const container = document.getElementById('view-financas');
+        if(!container) return;
+        const metas = db.financas.metas;
+        
+        container.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 class="gold">Gestão de Espólios</h2>
+                <i class="fas fa-cog gold" onclick="ajustarMetasFinanceiras()" style="cursor: pointer; font-size: 1.2rem;"></i>
+            </div>
+            
+            <div class="card" style="border-left: 5px solid var(--cor-ouro);">
+                <p class="small">Distribuição Atual:</p>
+                <div style="display: flex; justify-content: space-around; margin-top: 10px; font-weight: bold;">
+                    <div class="center"><span class="gold">${metas.necessario}%</span><br><small>Necessário</small></div>
+                    <div class="center"><span class="gold">${metas.lazer}%</span><br><small>Lazer</small></div>
+                    <div class="center"><span class="gold">${metas.legado}%</span><br><small>Legado</small></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <p class="center small italic">"Um guerreiro que não governa suas moedas será escravo delas."</p>
+            </div>
+            
+            <p class="center small" style="color: var(--texto-s);">Funcionalidades de fluxo de caixa em desenvolvimento...</p>
+        `;
+    }
+
+    function ajustarMetasFinanceiras() {
+        const n = prompt("Porcentagem para Necessário (Essencial):", db.financas.metas.necessario);
+        if (n === null) return;
+        const l = prompt("Porcentagem para Lazer (Recompensa):", db.financas.metas.lazer);
+        if (l === null) return;
+        const g = prompt("Porcentagem para Legado (Investimento):", db.financas.metas.legado);
+        if (g === null) return;
+
+        const total = parseInt(n) + parseInt(l) + parseInt(g);
+        if (total !== 100) {
+            alert("Erro: A soma das porcentagens deve ser exatamente 100%. (Sua soma: " + total + "%)");
+            return;
         }
+
+        db.financas.metas = { necessario: parseInt(n), lazer: parseInt(l), legado: parseInt(g) };
+        salvarDB();
+        renderizarFinancas();
+        alert("Estratégia financeira atualizada com sucesso!");
     }
 
     validarSessao();
-    
 </script>
 <script>
     /* ============================================================
@@ -1191,11 +1308,19 @@
         if(document.getElementById('stat-moedas')) document.getElementById('stat-moedas').innerText = db.usuario.moedas;
     }
 
+    /* CORREÇÃO DINÂMICA: DIA PERFEITO
+       Controla a entrega e a revogação do bônus caso a lista mude.
+    */
     function calcularProgressoDiario() {
         const hoje = getHoje();
-        const total = db.habitos.filter(h => h.freq === 'fixo').length || db.habitos.length;
-        const concluidos = db.registros[hoje].length;
-        const porcentagem = total > 0 ? Math.round((concluidos / total) * 100) : 0;
+        const habitosFixos = db.habitos.filter(h => h.freq === 'fixo');
+        const total = habitosFixos.length || db.habitos.length;
+        
+        // Conta apenas os concluídos que pertencem à lista de hábitos (evita lixo no array registros)
+        const concluidosIds = db.registros[hoje] || [];
+        const concluidosReal = habitosFixos.filter(h => concluidosIds.includes(h.id)).length;
+        
+        const porcentagem = total > 0 ? Math.round((concluidosReal / total) * 100) : 0;
 
         const barra = document.getElementById('barra-progresso-hoje');
         const texto = document.getElementById('texto-progresso-hoje');
@@ -1203,10 +1328,23 @@
         if (barra) barra.style.width = Math.min(porcentagem, 100) + '%';
         if (texto) texto.innerText = Math.min(porcentagem, 100) + '%';
 
-        if (porcentagem >= 100 && !db.conquistas.includes('perfeicao_' + hoje)) {
-            db.conquistas.push('perfeicao_' + hoje);
+        const idConquista = 'perfeicao_' + hoje;
+        const jaGanhouHoje = db.conquistas.includes(idConquista);
+
+        // Lógica: Se atingiu 100% e ainda não recebeu o bônus do ciclo atual
+        if (porcentagem >= 100 && !jaGanhouHoje) {
+            db.conquistas.push(idConquista);
             db.usuario.moedas += 100;
             alert("🏛️ DIA PERFEITO! +100 moedas de honra.");
+            salvarDB();
+            atualizarInterfaceStatus();
+        } 
+        // Lógica: Se o progresso caiu (ex: adicionou novo hábito ou desmarcou) e ele já tinha a conquista
+        else if (porcentagem < 100 && jaGanhouHoje) {
+            // Remove a conquista para permitir ganhar de novo ao completar
+            db.conquistas = db.conquistas.filter(c => c !== idConquista);
+            // Remove o bônus dado anteriormente (sistema punitivo/corretivo)
+            db.usuario.moedas = Math.max(0, db.usuario.moedas - 100);
             salvarDB();
             atualizarInterfaceStatus();
         }
@@ -1238,7 +1376,7 @@
     }
 </script>
 <script>
-    /* ============================================================
+ /* ============================================================
        SISTEMA DE SEGURANÇA: BACKUP EM JSON (PARTE 5 - BLINDADA)
        ============================================================ */
 
@@ -1251,8 +1389,8 @@
         return Math.abs(hash).toString(36);
     }
 
+    // REFATORADO: Download via Blob
     function exportarDadosTexto() {
-        const campo = document.getElementById('input-backup-texto');
         try {
             const dadosParaExportar = { 
                 ...db,
@@ -1268,60 +1406,64 @@
             };
             
             const jsonFinal = JSON.stringify(pacote);
+            const blob = new Blob([jsonFinal], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
             
-            // Exibe o código diretamente na caixa preta
-            if (campo) {
-                campo.value = jsonFinal;
-                campo.select();
-            }
-
-            navigator.clipboard.writeText(jsonFinal).then(() => {
-                alert("CÓDIGO DE HONRA GERADO NA CAIXA PRETA!");
-            });
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Backup_Guerreiro_${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            
+            URL.revokeObjectURL(url);
+            alert("CÓDIGO DE HONRA GERADO E DOWNLOAD INICIADO!");
         } catch (e) {
             alert("Erro ao forjar backup.");
         }
     }
 
+    // REFATORADO: Leitura via File Input dinâmico
     function importarDadosTexto() {
-        // Lógica Corrigida: Lê direto da caixa preta (textarea)
-        const campo = document.getElementById('input-backup-texto');
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
         
-        if (!campo || !campo.value.trim()) {
-            alert("ERRO: Cole o código na caixa preta antes de restaurar.");
-            return;
-        }
+        input.onchange = e => {
+            const file = e.target.files[0];
+            if (!file) return;
 
-        const codigo = campo.value.trim();
+            const reader = new FileReader();
+            reader.onload = event => {
+                try {
+                    const pacote = JSON.parse(event.target.result);
 
-        try {
-            const pacote = JSON.parse(codigo);
+                    const assinaturaReal = gerarAssinatura(pacote.payload);
+                    if (pacote.sig !== assinaturaReal) {
+                        alert("ERRO DE INTEGRIDADE: Backup corrompido ou alterado.");
+                        return;
+                    }
 
-            const assinaturaReal = gerarAssinatura(pacote.payload);
-            if (pacote.sig !== assinaturaReal) {
-                alert("ERRO DE INTEGRIDADE: Backup corrompido ou alterado.");
-                return;
-            }
+                    const novosDados = JSON.parse(pacote.payload);
+                    
+                    const idAtual = db.idInstalacao;
+                    db = novosDados;
+                    db.idInstalacao = idAtual; 
 
-            const novosDados = JSON.parse(pacote.payload);
-            
-            // Preserva o ID de instalação do dispositivo para evitar erros de licença
-            const idAtual = db.idInstalacao;
-            db = novosDados;
-            db.idInstalacao = idAtual; 
+                    salvarDB();
+                    alert("PROGRESSO RESTAURADO!");
 
-            salvarDB();
+                    if (typeof verificarBloqueio === "function" && verificarBloqueio()) {
+                        alert("AVISO: Conta com período de teste expirado.");
+                    }
 
-            alert("PROGRESSO RESTAURADO!");
-
-            if (typeof verificarBloqueio === "function" && verificarBloqueio()) {
-                alert("AVISO: Conta com período de teste expirado.");
-            }
-
-            location.reload();
-        } catch (e) {
-            alert("Texto inválido! Cole o código JSON completo na caixa preta.");
-        }
+                    location.reload();
+                } catch (err) {
+                    alert("Arquivo inválido! Certifique-se de selecionar um backup oficial do sistema.");
+                }
+            };
+            reader.readAsText(file);
+        };
+        
+        input.click();
     }
 
     /* ============================================================
@@ -1391,7 +1533,7 @@
     }
 
     /* ============================================================
-       SISTEMA DE CALENDÁRIO E TAREFAS
+       SISTEMA DE CALENDÁRIO E TAREFAS (LÓGICA DE CICLO DE VIDA)
        ============================================================ */
     
     let dataCalendario = new Date();
@@ -1420,7 +1562,15 @@
             const hoje = (typeof getHoje === "function" ? getHoje() : formatarDataParaID(new Date())) === dataStr;
             const selecionada = dataSelecionadaBatalha === dataStr;
 
-            const tarefasDoDia = db.tarefas.filter(t => t.data === dataStr || t.fixa);
+            const tarefasDoDia = db.tarefas.filter(t => {
+                const ativa = t.fixa 
+                    ? ((!t.criadaEm || t.criadaEm <= dataStr) && (!t.finalizadaEm || dataStr < t.finalizadaEm))
+                    : (t.data === dataStr);
+                
+                const naoRemovida = !t.removidasEm || !t.removidasEm.includes(dataStr);
+                return ativa && naoRemovida;
+            });
+
             const concluidas = db.progressoTarefas[dataStr] || [];
             const tudoPronto = tarefasDoDia.length > 0 && tarefasDoDia.every(t => concluidas.includes(t.id));
 
@@ -1461,7 +1611,10 @@
             nome: nome,
             turno: turno,
             fixa: ehFixa,
-            data: ehFixa ? null : dataSelecionadaBatalha
+            data: ehFixa ? null : dataSelecionadaBatalha,
+            criadaEm: dataSelecionadaBatalha,
+            removidasEm: [],
+            finalizadaEm: null 
         });
         
         salvarDB();
@@ -1481,7 +1634,14 @@
         tituloData.innerHTML = `TAREFAS DE: ${dataFormatada}`;
         lista.innerHTML = '';
 
-        const tarefasExibir = db.tarefas.filter(t => t.fixa || t.data === dataSelecionadaBatalha);
+        const tarefasExibir = db.tarefas.filter(t => {
+            const ativa = t.fixa 
+                ? ((!t.criadaEm || t.criadaEm <= dataSelecionadaBatalha) && (!t.finalizadaEm || dataSelecionadaBatalha < t.finalizadaEm))
+                : (t.data === dataSelecionadaBatalha);
+            
+            const naoRemovida = !t.removidasEm || !t.removidasEm.includes(dataSelecionadaBatalha);
+            return ativa && naoRemovida;
+        });
         
         if (tarefasExibir.length === 0) {
             lista.innerHTML = '<p class="small center italic" style="padding:20px;">Sem ordens para hoje.</p>';
@@ -1524,8 +1684,11 @@
         const index = db.progressoTarefas[dataSelecionadaBatalha].indexOf(id);
         
         if (index > -1) {
+            // DESMARCANDO: Remove o XP (Lógica de Honra)
             db.progressoTarefas[dataSelecionadaBatalha].splice(index, 1);
+            db.usuario.xp = Math.max(0, db.usuario.xp - 10); 
         } else {
+            // MARCANDO: Ganha XP
             db.progressoTarefas[dataSelecionadaBatalha].push(id);
             db.usuario.xp += 10;
         }
@@ -1538,14 +1701,35 @@
     }
 
     function removerTarefaBatalha(id) {
-        if (confirm("Deseja remover esta tarefa?")) {
-            db.tarefas = db.tarefas.filter(t => t.id !== id);
-            salvarDB();
-            renderizarTarefasBatalha();
-            inicializarCalendario();
+        const tarefa = db.tarefas.find(t => t.id === id);
+        if (!tarefa) return;
+
+        if (tarefa.fixa) {
+            const opcao = prompt("🏛️ GESTÃO DE TAREFA FIXA\n\n1 - Remover APENAS HOJE\n2 - Encerrar de HOJE EM DIANTE (Mantém o passado)\n3 - APAGAR TUDO (Deleta do banco)", "1");
+
+            if (opcao === "1") {
+                if (!tarefa.removidasEm) tarefa.removidasEm = [];
+                tarefa.removidasEm.push(dataSelecionadaBatalha);
+            } else if (opcao === "2") {
+                tarefa.finalizadaEm = dataSelecionadaBatalha; 
+            } else if (opcao === "3") {
+                if(confirm("Isso apagará a tarefa e seu histórico permanentemente. Confirmar?")) {
+                    db.tarefas = db.tarefas.filter(t => t.id !== id);
+                } else { return; }
+            } else { return; }
+        } else {
+            if (confirm("Deseja remover esta tarefa permanentemente?")) {
+                db.tarefas = db.tarefas.filter(t => t.id !== id);
+            } else { return; }
         }
+        
+        salvarDB();
+        renderizarTarefasBatalha();
+        inicializarCalendario();
     }
-    /* ============================================================
+</script>
+<script>
+/* ============================================================
        SISTEMA ANTI-VÍCIOS (DOMÍNIO PRÓPRIO) - PARTE 5 & 6
        ============================================================ */
     
@@ -1692,7 +1876,6 @@
        ============================================================ */
 
     function validarChaveDireta() {
-        // Tenta capturar a chave de qualquer um dos inputs (Configuração ou Bloqueio)
         const inputConfig = document.getElementById('input-chave-config');
         const inputBloqueio = document.getElementById('input-chave-ativacao');
         
@@ -1703,17 +1886,35 @@
             return;
         }
 
-        // FÓRMULA MATEMÁTICA DE VALIDAÇÃO (Baseada no ID único do dispositivo)
         const calculoCorreto = Math.floor((db.usuario.idInstalacao * 17) + 2026 + (db.usuario.idInstalacao / 2));
 
         if (parseInt(chaveInserida) === calculoCorreto) {
             db.usuario.isPro = true;
             salvarDB();
             
+            // Atualiza a interface imediatamente antes do reload
+            verificarInterfacePro();
+            
             alert("⚔️ ACESSO DE ELITE LIBERADO!\nSua honra foi validada. O sistema está 100% desbloqueado.");
-            location.reload(); // Recarrega para aplicar todas as mudanças
+            location.reload(); 
         } else {
             alert("❌ CHAVE INCORRETA!\nVerifique se o seu ID de Instalação condiz com a chave fornecida.");
+        }
+    }
+
+    /**
+     * NOVA: Gerencia a visibilidade dos elementos baseada no status PRO
+     */
+    function verificarInterfacePro() {
+        const areaAtivacao = document.getElementById('area-viri-pro');
+        const statusBadge = document.getElementById('status-guerreiro-pro');
+
+        if (db.usuario && db.usuario.isPro) {
+            if (areaAtivacao) areaAtivacao.style.display = 'none';
+            if (statusBadge) statusBadge.style.display = 'block';
+        } else {
+            if (areaAtivacao) areaAtivacao.style.display = 'block';
+            if (statusBadge) statusBadge.style.display = 'none';
         }
     }
 
@@ -1733,7 +1934,6 @@
     function atualizarProgressoDesafios() {
         if (!db.desafios || !db.registros) return;
 
-        // Mapeamento de Desafio ID -> Lista de IDs de Hábitos necessários
         const mapaCombos = { 
             7:  [907, 908], 
             20: [920, 921, 922], 
@@ -1747,7 +1947,6 @@
                 const habitosRequeridos = mapaCombos[desafio.id];
                 let diasCompletos = 0;
 
-                // Para cada dia no histórico, verifica se TODOS os hábitos do combo foram feitos
                 Object.keys(db.registros).forEach(data => {
                     const feitosNoDia = db.registros[data] || [];
                     const completouCombo = habitosRequeridos.every(id => feitosNoDia.includes(id));
@@ -1778,7 +1977,6 @@
 
         if(!confirm(`Iniciar ${desafio.nome}? Isso adicionará múltiplos hábitos à sua rotina. Aceita o fardo?`)) return;
 
-        // Definição dos Combos de Evolução Real
         const combos = {
             7: [
                 { id: 907, nome: "🧊 Banho Gelado (Acordar)", cat: "Corpo", tipo: "check", freq: "fixo", xp: 30 },
@@ -1858,201 +2056,357 @@
                 <div class="progress-outer" style="background:#222; height:8px; border-radius:4px; margin:12px 0; overflow:hidden;">
                     <div class="progress-inner" style="width:${porcentagem}%; background:var(--cor-ouro); height:100%; transition: 0.5s;"></div>
                 </div>
+                
+                <!-- 🔥 NOVO: RECOMPENSA -->
+                <p class="small gold" style="margin-bottom:5px;">💰 Recompensa: ${d.recompensa} moedas</p>
+
                 <p class="small" style="color:#888; font-size:0.65rem; margin-bottom:10px;">
                     ${d.ativo ? '⚠️ Requer conclusão de TODOS os hábitos do combo diariamente.' : 'Aceite para ver os novos hábitos.'}
                 </p>
-                ${!d.ativo 
-                    ? `<button class="btn-guerreiro" onclick="ativarDesafioSistemico(${d.id})" style="width:100%;">ACEITAR MISSÃO</button>`
-                    : `<button class="btn-guerreiro" onclick="abandonarDesafio(${d.id})" style="background:#331111; border-color:#552222; width:100%; font-size:0.6rem;">ABANDONAR</button>`
+
+                ${
+                    d.finalizado
+                    ? `<button class="btn-guerreiro" style="width:100%; background:#1B5E20; border-color:#2E7D32;" disabled>🏆 DESAFIO CONCLUÍDO</button>`
+: !d.ativo 
+                        ? `<button class="btn-guerreiro" onclick="ativarDesafioSistemico(${d.id})" style="width:100%;">ACEITAR MISSÃO</button>`
+                        : `<button class="btn-guerreiro" onclick="abandonarDesafio(${d.id})" style="background:#331111; border-color:#552222; width:100%; font-size:0.6rem;">ABANDONAR</button>`
                 }
             `;
             container.appendChild(card);
         });
     }
     /* ============================================================
-       MURALHA DE CONHECIMENTO (E-BOOKS & CONTEÚDO ELITE)
-       ============================================================ */
+   MURALHA DE CONHECIMENTO (E-BOOKS & CONTEÚDO ELITE)
+   ============================================================ */
 
-    function renderizarPremium() {
-        const container = document.getElementById('lista-ebooks');
-        if (!container) return;
-        
-        container.innerHTML = `
-            <div class="card" style="border: 1px solid var(--cor-ouro); background: rgba(212,175,55,0.05); margin-bottom:15px; padding: 15px;">
-                <h4 class="gold" style="margin-top:0;"><i class="fas fa-scroll"></i> MANUAL DO GUERREIRO</h4>
-                <p class="small" style="color: #ccc;">Guia oficial de operações e conduta da Software Ferreira.</p>
-                <button onclick="tentarAbrirEbook('manual')" class="btn-guerreiro" style="font-size:0.7rem; margin-top:10px; width:100%;">ABRIR MANUAL (PDF)</button>
-            </div>
-            <div class="card" style="border: 1px solid gold; background: rgba(212,175,55,0.02); margin-bottom:15px; padding: 15px;">
-                <h4 class="gold" style="margin-top:0;"><i class="fas fa-brain"></i> MENTALIDADE DE FERRO</h4>
-                <p class="small" style="color: #ccc;">Domine suas emoções e destrua a procrastinação. (Inclui Audiobook 🎧)</p>
-                <button onclick="tentarAbrirEbook('mentalidade')" class="btn-guerreiro" style="font-size:0.7rem; margin-top:10px; width:100%;">ACESSAR CONTEÚDO</button>
-            </div>
-            <div class="card" style="border: 1px solid gold; background: rgba(212,175,55,0.02); margin-bottom:15px; padding: 15px;">
-                <h4 class="gold" style="margin-top:0;"><i class="fas fa-dumbbell"></i> GUIA DE CALISTENIA</h4>
-                <p class="small" style="color: #ccc;">Treino de elite utilizando apenas o peso do corpo e disciplina.</p>
-                <button onclick="tentarAbrirEbook('calistenia')" class="btn-guerreiro" style="font-size:0.7rem; margin-top:10px; width:100%;">ABRIR GUIA DE TREINO</button>
-            </div>
-        `;
+function renderizarPremium() {
+    const container = document.getElementById('lista-ebooks');
+    if (!container) return;
+
+    // Garantia de compatibilidade com usuários antigos
+    if (!db.usuario.ebooksComprados) db.usuario.ebooksComprados = [];
+
+    const comprado1 = db.usuario.ebooksComprados.includes('orador');
+    const comprado2 = db.usuario.ebooksComprados.includes('comunicacao');
+    
+    container.innerHTML = `
+        <div class="card" style="border: 1px solid var(--cor-ouro); background: rgba(212,175,55,0.05); margin-bottom:15px; padding: 15px;">
+            <h4 class="gold" style="margin-top:0;"><i class="fas fa-scroll"></i> MANUAL DO GUERREIRO</h4>
+            <p class="small" style="color: #ccc;">Guia oficial de operações e conduta da Software Ferreira.</p>
+            <button onclick="tentarAbrirEbook('manual')" class="btn-guerreiro" style="font-size:0.7rem; margin-top:10px; width:100%;">ABRIR MANUAL (PDF)</button>
+        </div>
+
+        <div class="card" style="border: 1px solid gold; background: rgba(212,175,55,0.02); margin-bottom:15px; padding: 15px;">
+            <h4 class="gold" style="margin-top:0;"><i class="fas fa-brain"></i> MENTALIDADE DE FERRO</h4>
+            <p class="small" style="color: #ccc;">Domine suas emoções e destrua a procrastinação. (Inclui Audiobook 🎧)</p>
+            <button onclick="tentarAbrirEbook('mentalidade')" class="btn-guerreiro" style="font-size:0.7rem; margin-top:10px; width:100%;">ACESSAR CONTEÚDO</button>
+        </div>
+
+        <div class="card" style="border: 1px solid gold; background: rgba(212,175,55,0.02); margin-bottom:15px; padding: 15px;">
+            <h4 class="gold" style="margin-top:0;"><i class="fas fa-dumbbell"></i> GUIA DE CALISTENIA</h4>
+            <p class="small" style="color: #ccc;">Treino de elite utilizando apenas o peso do corpo e disciplina.</p>
+            <button onclick="tentarAbrirEbook('calistenia')" class="btn-guerreiro" style="font-size:0.7rem; margin-top:10px; width:100%;">ABRIR GUIA DE TREINO</button>
+        </div>
+
+        <div class="card" style="border: 1px solid gold; background: rgba(212,175,55,0.02); margin-bottom:15px; padding: 15px;">
+            <h4 class="gold" style="margin-top:0;">O ORADOR QUE DIVIDIU A HISTÓRIA</h4>
+            <p class="small" style="color: #ccc;">Uma visão técnica e prática da oratória do maior líder da história.</p>
+            <p class="small" style="color:#aaa;">Disponível também em Audiobook 🎧</p>
+            <p class="small gold">💰 3130 moedas</p>
+            <button onclick="${comprado1 ? "abrirEbookComprado('orador')" : "comprarEbook('orador')"}"
+                class="btn-guerreiro"
+                style="font-size:0.7rem; margin-top:10px; width:100%;">
+                ${comprado1 ? "ACESSAR CONTEÚDO" : "COMPRAR E ACESSAR"}
+            </button>
+        </div>
+
+        <div class="card" style="border: 1px solid gold; background: rgba(212,175,55,0.02); margin-bottom:15px; padding: 15px;">
+            <h4 class="gold" style="margin-top:0;">COMUNICAÇÃO: A ARTE DE SE CONECTAR</h4>
+            <p class="small" style="color: #ccc;">Guia de oratória prática baseado em grandes obras da comunicação.</p>
+            <p class="small" style="color:#aaa;">Disponível também em Audiobook 🎧</p>
+            <p class="small gold">💰 5243 moedas</p>
+            <button onclick="${comprado2 ? "abrirEbookComprado('comunicacao')" : "comprarEbook('comunicacao')"}"
+                class="btn-guerreiro"
+                style="font-size:0.7rem; margin-top:10px; width:100%;">
+                ${comprado2 ? "ACESSAR CONTEÚDO" : "COMPRAR E ACESSAR"}
+            </button>
+        </div>
+    `;
+}
+function comprarEbook(tipo) {
+    if (!db.usuario.isPro) {
+        alert("ACESSO NEGADO. Esta sabedoria é reservada para membros da Elite (PRO).");
+        return;
     }
 
-    function tentarAbrirEbook(tipo) {
-        // O manual é livre, os outros pedem PRO
-        if (tipo !== 'manual' && !db.usuario.isPro) {
-            alert("ACESSO NEGADO. Esta sabedoria é reservada para membros da Elite (PRO).");
-            return;
+    const ebooks = {
+        orador: {
+            preco: 3130,
+            link: "https://drive.google.com/file/d/1XFi51etgAMHOav2dg4-r1zFdZ_cySsdH/view?usp=drivesdk"
+        },
+        comunicacao: {
+            preco: 5243,
+            link: "https://drive.google.com/file/d/1_3qAxwyM-8jKO1fRuQdZpDgoJICldDsn/view?usp=drivesdk"
         }
-        
-        const links = {
-            // LINK NOVO DO MANUAL ATUALIZADO ABAIXO:
-            manual: "https://drive.google.com/file/d/1N03AdA0S75qBKnAmrjA5lYJakX1saQvH/view?usp=drivesdk",
-            mentalidade: "https://drive.google.com/file/d/1XCZ_Ys5LMd7LEnP9_qJOaH6YOhF5LWRZ/view?usp=drivesdk",
-            calistenia: "https://drive.google.com/file/d/1XWA__wJzWEuSL6EI3woJ9Jo073ffAqMM/view?usp=drivesdk"
-        };
-
-        window.open(links[tipo], '_blank');
-    }
-
-    /* ============================================================
-       INICIALIZAÇÃO GLOBAL E SINCRONIZAÇÃO (ONLOAD)
-       ============================================================ */
-
-    window.onload = function() {
-        // 1. Integridade do Banco de Dados
-        if (!db.valoresGuerreiro) db.valoresGuerreiro = [];
-        if (!db.config) db.config = { ultimoBackup: null, tema: 'dark' };
-        
-        // Inicializa os desafios caso não existam
-        if (!db.desafios || db.desafios.length === 0) {
-            db.desafios = [
-                { id: 7, nome: "BATISMO DE GELO", dias: 7, recompensa: 100, ativo: false, progresso: 0, finalizado: false },
-                { id: 20, nome: "PROTOCOLO SAÚDE", dias: 20, recompensa: 300, ativo: false, progresso: 0, finalizado: false },
-                { id: 40, nome: "FOCO FILOSÓFICO", dias: 40, recompensa: 600, ativo: false, progresso: 0, finalizado: false },
-                { id: 60, nome: "DIÁRIO DE GUERRA", dias: 60, recompensa: 1000, ativo: false, progresso: 0, finalizado: false },
-                { id: 90, nome: "FORJA ESTOICA", dias: 90, recompensa: 2500, ativo: false, progresso: 0, finalizado: false }
-            ];
-        }
-
-        // 2. Aplicação do Status PRO na Interface
-        if(db.usuario && db.usuario.isPro) {
-            const muralha = document.getElementById('muralha-pro');
-            const tabs = document.querySelector('.bottom-tabs');
-            if (muralha) muralha.style.display = 'none';
-            if (tabs) tabs.style.display = 'flex';
-        }
-
-        // 3. Execução de Motores de Renderização
-        if (typeof validarSessao === "function") validarSessao();
-        if (typeof renderizarHome === "function") renderizarHome();
-        if (typeof atualizarFrase === "function") atualizarFrase(); 
-        
-        // Sincroniza o progresso dos desafios baseando-se no histórico
-        if (typeof atualizarProgressoDesafios === "function") atualizarProgressoDesafios(); 
-
-        console.log("SISTEMA FERREIRA: MANUAL ATUALIZADO E SISTEMA OPERACIONAL.");
     };
-</script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <script>
-    function renderizarGraficos() {
-        const container = document.getElementById('view-grafico');
-        
-        // Coleta de dados dos últimos 7 dias
-        const labels = [];
-        const dadosHabitos = [];
-        const dadosTarefas = [];
-        
-        for (let i = 6; i >= 0; i--) {
-            const data = new Date();
-            data.setDate(data.getDate() - i);
-            const dataId = formatarDataParaID(data);
-            const diaSemana = data.toLocaleDateString('pt-BR', { weekday: 'short' });
-            
-            labels.push(diaSemana);
-            
-            // Calcula % de hábitos concluídos no dia
-            const registroDia = db.registros[dataId] || [];
-            const totalHabitos = db.habitos.length;
-            const concluidoHabitos = registroDia.length;
-            const porcHabitos = totalHabitos > 0 ? Math.round((concluidoHabitos / totalHabitos) * 100) : 0;
-            dadosHabitos.push(porcHabitos);
 
-            // Calcula % de tarefas concluídas no dia
-            const tarefasDia = db.progressoTarefas[dataId] || { total: 0, concluidas: 0 };
-            const porcTarefas = tarefasDia.total > 0 ? Math.round((tarefasDia.concluidas / tarefasDia.total) * 100) : 0;
-            dadosTarefas.push(porcTarefas);
-        }
+    const ebook = ebooks[tipo];
 
-        container.innerHTML = `
-            <h2 class="gold center">Estatísticas de Guerra</h2>
-            <p class="small center" style="margin-bottom:20px;">Análise dos últimos 7 dias de combate.</p>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
-                <div class="card center" style="padding: 10px; border-top: 2px solid var(--cor-ouro);">
-                    <i class="fas fa-coins gold"></i>
-                    <p class="small">Riqueza</p>
-                    <h4 class="gold">${db.usuario.moedas}</h4>
-                </div>
-                <div class="card center" style="padding: 10px; border-top: 2px solid var(--cor-ouro);">
-                    <i class="fas fa-bolt gold"></i>
-                    <p class="small">Poder (XP)</p>
-                    <h4 class="gold">${db.usuario.xp}</h4>
-                </div>
-            </div>
-
-            <div class="card">
-                <canvas id="chartEvolucao" style="width:100%; height:250px;"></canvas>
-            </div>
-
-            <div class="card card-guerreiro">
-                <h4 class="gold"><i class="fas fa-shield-virus"></i> Escudo Ativo</h4>
-                ${db.vicios.map(v => `
-                    <div style="margin-top:10px;">
-                        <p class="small">${v.nome}</p>
-                        <p style="font-weight:bold; color:var(--cor-ouro-brilho);">${v.diasLimpos} Dias de Pureza</p>
-                    </div>
-                `).join('')}
-            </div>
-
-            <button class="btn-guerreiro" onclick="navegar('home')">Voltar ao Quartel</button>
-        `;
-
-        // Inicializa o gráfico após renderizar o HTML
-        const ctx = document.getElementById('chartEvolucao').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Hábitos %',
-                    data: dadosHabitos,
-                    borderColor: '#D4AF37',
-                    backgroundColor: 'rgba(212, 175, 55, 0.2)',
-                    fill: true,
-                    tension: 0.4
-                }, {
-                    label: 'Tarefas %',
-                    data: dadosTarefas,
-                    borderColor: '#E0E0E0',
-                    borderDash: [5, 5],
-                    fill: false,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true, max: 100, grid: { color: '#333' }, ticks: { color: '#888' } },
-                    x: { grid: { display: false }, ticks: { color: '#888' } }
-                },
-                plugins: {
-                    legend: { labels: { color: '#D4AF37', font: { size: 10 } } }
-                }
-            }
-        });
+    if (db.usuario.moedas < ebook.preco) {
+        alert("Saldo insuficiente. Continue evoluindo para adquirir este conhecimento.");
+        return;
     }
 
-    // Define a função no objeto window para o navegar() encontrar
-    window.renderizarGraficos = renderizarGraficos;
+    db.usuario.moedas -= ebook.preco;
+
+    if (!db.usuario.ebooksComprados) db.usuario.ebooksComprados = [];
+    db.usuario.ebooksComprados.push(tipo);
+
+    salvarDB();
+
+    alert("📚 Aquisição concluída! Este conhecimento agora é seu permanentemente.");
+
+    window.open(ebook.link, '_blank');
+    renderizarPremium();
+}
+
+function abrirEbookComprado(tipo) {
+    const links = {
+        orador: "https://drive.google.com/file/d/1XFi51etgAMHOav2dg4-r1zFdZ_cySsdH/view?usp=drivesdk",
+        comunicacao: "https://drive.google.com/file/d/1_3qAxwyM-8jKO1fRuQdZpDgoJICldDsn/view?usp=drivesdk"
+    };
+
+    window.open(links[tipo], '_blank');
+}
+
+function tentarAbrirEbook(tipo) {
+    if (tipo !== 'manual' && !db.usuario.isPro) {
+        alert("ACESSO NEGADO. Esta sabedoria é reservada para membros da Elite (PRO).");
+        return;
+    }
+    
+    const links = {
+        manual: "https://drive.google.com/file/d/1FgR7xjADWnSlyGyw8qDhg056IfOBROSS/view?usp=drivesdk",
+        mentalidade: "https://drive.google.com/file/d/1XCZ_Ys5LMd7LEnP9_qJOaH6YOhF5LWRZ/view?usp=drivesdk",
+        calistenia: "https://drive.google.com/file/d/1XWA__wJzWEuSL6EI3woJ9Jo073ffAqMM/view?usp=drivesdk"
+    };
+
+    window.open(links[tipo], '_blank');
+}
+
+/* ============================================================
+   INICIALIZAÇÃO GLOBAL E SINCRONIZAÇÃO (ONLOAD)
+   ============================================================ */
+
+window.onload = function() {
+    if (!db.valoresGuerreiro) db.valoresGuerreiro = [];
+    if (!db.config) db.config = { ultimoBackup: null, tema: 'dark' };
+    
+    if (!db.desafios || db.desafios.length === 0) {
+        db.desafios = [
+            { id: 7, nome: "BATISMO DE GELO", dias: 7, recompensa: 100, ativo: false, progresso: 0, finalizado: false },
+            { id: 20, nome: "PROTOCOLO SAÚDE", dias: 20, recompensa: 300, ativo: false, progresso: 0, finalizado: false },
+            { id: 40, nome: "FOCO FILOSÓFICO", dias: 40, recompensa: 600, ativo: false, progresso: 0, finalizado: false },
+            { id: 60, nome: "DIÁRIO DE GUERRA", dias: 60, recompensa: 1000, ativo: false, progresso: 0, finalizado: false },
+            { id: 90, nome: "FORJA ESTOICA", dias: 90, recompensa: 2500, ativo: false, progresso: 0, finalizado: false }
+        ];
+    }
+
+    // --- CORREÇÃO PARA INTERFACE PRO ---
+    // Esta chamada ativa a função que criamos na Parte 6 para sumir com os botões
+    if (typeof verificarInterfacePro === "function") {
+        verificarInterfacePro();
+    }
+
+    // Mantém a lógica original de outras travas caso existam
+    if(db.usuario && db.usuario.isPro) {
+        const muralha = document.getElementById('muralha-pro');
+        const tabs = document.getElementById('bottom-tabs'); 
+        if (muralha) muralha.style.display = 'none';
+        if (tabs) tabs.style.display = 'flex';
+    }
+
+    if (typeof validarSessao === "function") validarSessao();
+    if (typeof renderizarHome === "function") renderizarHome();
+    if (typeof atualizarFrase === "function") atualizarFrase(); 
+    if (typeof atualizarProgressoDesafios === "function") atualizarProgressoDesafios(); 
+
+    console.log("SISTEMA FERREIRA: INTERFACE PRO VALIDADA.");
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function renderizarGraficos() {
+    const container = document.getElementById('view-grafico');
+    if (!container) return;
+
+    // 1. Coleta de dados dos últimos 7 dias
+    const labels = [];
+    const dadosHabitos = [];
+    const dadosTarefas = [];
+    
+    for (let i = 6; i >= 0; i--) {
+        const data = new Date();
+        data.setDate(data.getDate() - i);
+        const dataId = formatarDataParaID(data);
+        const diaSemana = data.toLocaleDateString('pt-BR', { weekday: 'short' });
+        labels.push(diaSemana);
+
+        // Hábitos
+        const registroDia = db.registros[dataId] || [];
+        const totalHabitos = db.habitos.length;
+        const porcHabitos = totalHabitos > 0 ? Math.round((registroDia.length / totalHabitos) * 100) : 0;
+        dadosHabitos.push(porcHabitos);
+
+        // Tarefas
+        const tarefasAtivasNoDia = db.tarefas.filter(t => {
+            const ativa = t.fixa 
+                ? ((!t.criadaEm || t.criadaEm <= dataId) && (!t.finalizadaEm || dataId < t.finalizadaEm))
+                : (t.data === dataId);
+            const naoRemovida = !t.removidasEm || !t.removidasEm.includes(dataId);
+            return ativa && naoRemovida;
+        });
+        const concluidasIds = db.progressoTarefas[dataId] || [];
+        const concluidasContagem = tarefasAtivasNoDia.filter(t => concluidasIds.includes(t.id)).length;
+        const porcTarefas = tarefasAtivasNoDia.length > 0 ? Math.round((concluidasContagem / tarefasAtivasNoDia.length) * 100) : 0;
+        dadosTarefas.push(porcTarefas);
+    }
+
+    // 2. Lógica de Evolução Ajustada (Consistência vs Tendência)
+    function calcularStatus(dados) {
+        const media = dados.reduce((a, b) => a + b, 0) / dados.length;
+        const inicio = (dados[0] + dados[1] + dados[2]) / 3;
+        const fim = (dados[4] + dados[5] + dados[6]) / 3;
+        const diff = fim - inicio;
+
+        // Se a média da semana for altíssima (acima de 95%), mostramos 100% de consistência
+        if (media >= 95) return { valor: "100%", cor: "var(--cor-sucesso)", icon: "fa-star" };
+        
+        // Caso contrário, mostra a tendência normal
+        if (diff >= 0) return { valor: "+" + Math.abs(diff).toFixed(0) + "%", cor: "var(--cor-sucesso)", icon: "fa-arrow-trend-up" };
+        return { valor: "-" + Math.abs(diff).toFixed(0) + "%", cor: "var(--cor-perigo)", icon: "fa-arrow-trend-down" };
+    }
+
+    const statusHabitos = calcularStatus(dadosHabitos);
+    const statusTarefas = calcularStatus(dadosTarefas);
+
+    // 3. Lógica de Finanças
+    const totalRenda = (db.financas.salarios || []).reduce((acc, curr) => acc + curr.valor, 0);
+    const totalGasto = (db.financas.despesas || []).reduce((acc, curr) => acc + curr.valor, 0);
+    const saldoAtual = totalRenda - totalGasto;
+
+    // 4. Frases Motivacionais
+    const mediaGeral = (dadosHabitos[6] + dadosTarefas[6]) / 2;
+    const frasesEvoluindo = [
+        "O aço é forjado no fogo. Continue avançando!",
+        "Sua disciplina é sua maior armadura.",
+        "Um guerreiro não para quando está cansado, para quando venceu.",
+        "Mantenha o ritmo! A constância é o segredo dos mestres.",
+        "Você está dominando seus instintos. Honra!"
+    ];
+    const frasesRegredindo = [
+        "A guarda baixada é o convite para a derrota. Reaja!",
+        "Onde está sua honra? Volte ao plano agora.",
+        "A dor da disciplina é menor que a dor do arrependimento.",
+        "Um dia perdido é uma batalha entregue ao inimigo.",
+        "Levante-se! O quartel não aceita desculpas."
+    ];
+    const fraseSorteada = mediaGeral >= 50 
+        ? frasesEvoluindo[Math.floor(Math.random() * frasesEvoluindo.length)]
+        : frasesRegredindo[Math.floor(Math.random() * frasesRegredindo.length)];
+
+    // 5. Renderização
+    container.innerHTML = `
+        <h2 class="gold center">Estatísticas de Guerra</h2>
+        <p class="small center" style="margin-bottom:20px; padding: 0 10px; min-height: 30px;">${fraseSorteada}</p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px;">
+            <div class="card center" style="padding: 10px; border-top: 2px solid var(--cor-ouro);">
+                <i class="fas fa-coins gold"></i>
+                <p style="font-size:0.6rem;">SALDO</p>
+                <h4 style="color:${saldoAtual >= 0 ? '#fff' : 'var(--cor-perigo)'}; font-size:0.8rem;">R$ ${saldoAtual.toFixed(2)}</h4>
+            </div>
+            <div class="card center" style="padding: 10px; border-top: 2px solid var(--cor-ouro);">
+                <i class="fas fa-bolt gold"></i>
+                <p style="font-size:0.6rem;">PODER</p>
+                <h4 class="gold" style="font-size:0.8rem;">${db.usuario.xp}</h4>
+            </div>
+            <div class="card center" style="padding: 10px; border-top: 2px solid var(--cor-ouro);">
+                <i class="fas fa-trophy gold"></i>
+                <p style="font-size:0.6rem;">MOEDAS</p>
+                <h4 class="gold" style="font-size:0.8rem;">${db.usuario.moedas}</h4>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom:15px;">
+            <canvas id="chartEvolucao" style="width:100%; height:200px;"></canvas>
+        </div>
+
+        <div class="card card-guerreiro" style="padding: 15px;">
+            <h4 class="gold center" style="font-size:0.8rem; margin-bottom:15px; text-transform:uppercase;">Relatório de Tendência</h4>
+            
+            <div style="display: flex; justify-content: space-around; align-items: center; text-align: center;">
+                <div style="flex:1;">
+                    <p class="small" style="color:#888;">Disciplina (Hábitos)</p>
+                    <div style="font-size: 1.1rem; margin-top:5px; color: ${statusHabitos.cor}">
+                        <i class="fas ${statusHabitos.icon}"></i> 
+                        ${statusHabitos.valor}
+                    </div>
+                </div>
+                
+                <div style="width:1px; height:40px; background:#222;"></div>
+
+                <div style="flex:1;">
+                    <p class="small" style="color:#888;">Execução (Tarefas)</p>
+                    <div style="font-size: 1.1rem; margin-top:5px; color: ${statusTarefas.cor}">
+                        <i class="fas ${statusTarefas.icon}"></i> 
+                        ${statusTarefas.valor}
+                    </div>
+                </div>
+            </div>
+            <p class="center italic" style="font-size:0.55rem; color:#555; margin-top:10px;">
+                ${mediaGeral >= 95 ? 'Nível de constância lendário atingido!' : 'Comparativo de performance semanal.'}
+            </p>
+        </div>
+
+        <button class="btn-guerreiro" onclick="navegar('home')" style="margin-top:15px;">Voltar ao Quartel</button>
+    `;
+
+    const ctx = document.getElementById('chartEvolucao').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Hábitos %',
+                data: dadosHabitos,
+                borderColor: '#D4AF37',
+                backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                fill: true,
+                tension: 0.3
+            }, {
+                label: 'Tarefas %',
+                data: dadosTarefas,
+                borderColor: '#E0E0E0',
+                borderDash: [5, 5],
+                fill: false,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, max: 100, grid: { color: '#222' }, ticks: { color: '#666', font: { size: 10 } } },
+                x: { grid: { display: false }, ticks: { color: '#666', font: { size: 10 } } }
+            },
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#888', font: { size: 9 } } }
+            }
+        }
+    });
+}
+window.renderizarGraficos = renderizarGraficos;
 </script>
 <script>
     function renderizarDiario() {
@@ -2206,6 +2560,9 @@
         const mesNome = dataAlvo.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase();
         const mesId = dataAlvo.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
 
+        // Busca as metas personalizadas do DB (ou usa o padrão 50/30/20 se não achar)
+        const metasDB = db.financas.metas || { necessario: 50, lazer: 30, legado: 20 };
+
         let dados;
         if (mesOffsetFinancas === 0) {
             dados = { 
@@ -2226,7 +2583,9 @@
         container.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <button onclick="navegarMesFinancas(-1)" style="background:none; border:none; color:var(--cor-ouro); font-size:1.2rem;"><i class="fas fa-chevron-left"></i></button>
-                <h2 class="gold center" style="font-size: 1.1rem; margin:0;">${mesNome}</h2>
+                <div style="text-align:center;">
+                    <h2 class="gold center" style="font-size: 1.1rem; margin:0;">${mesNome}</h2>
+                </div>
                 <button onclick="navegarMesFinancas(1)" style="background:none; border:none; color:var(--cor-ouro); font-size:1.2rem;"><i class="fas fa-chevron-right"></i></button>
             </div>
 
@@ -2240,7 +2599,10 @@
             </div>
 
             <div class="card">
-                <p class="center gold small" style="margin-bottom:10px;">DISTRIBUIÇÃO ATUAL</p>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <p class="gold small" style="margin:0;">DISTRIBUIÇÃO REAL</p>
+                    <i class="fas fa-cog gold" onclick="ajustarMetasFinanceiras()" style="cursor:pointer; font-size:0.9rem;"></i>
+                </div>
                 <div style="max-width: 160px; margin: 0 auto;">
                     <canvas id="chartFinancas"></canvas>
                 </div>
@@ -2259,9 +2621,9 @@
 
             <div class="card card-guerreiro">
                 <h4 class="gold center small" style="margin-bottom:15px;">SAÚDE DAS COLUNAS</h4>
-                ${criarBarraMeta("NECESSÁRIO (50%)", totalNec, totalRenda, 50, "#3498db")}
-                ${criarBarraMeta("LAZER (30%)", totalLaz, totalRenda, 30, "#f1c40f")}
-                ${criarBarraMeta("LEGADO (20%)", totalLeg, totalRenda, 20, "#2ecc71")}
+                ${criarBarraMeta(`NECESSÁRIO (${metasDB.necessario}%)`, totalNec, totalRenda, metasDB.necessario, "#3498db")}
+                ${criarBarraMeta(`LAZER (${metasDB.lazer}%)`, totalLaz, totalRenda, metasDB.lazer, "#f1c40f")}
+                ${criarBarraMeta(`LEGADO (${metasDB.legado}%)`, totalLeg, totalRenda, metasDB.legado, "#2ecc71")}
             </div>
 
             <div class="card">
@@ -2284,14 +2646,24 @@
     }
 
     function renderizarItensExtrato(dados) {
-        const todos = [...dados.salarios, ...dados.despesas].sort((a, b) => b.data - a.data);
+        // Criamos arrays mapeados mantendo o índice original para permitir exclusão
+        const salariosMapeados = dados.salarios.map((item, i) => ({...item, origem: 'salarios', index: i}));
+        const despesasMapeados = dados.despesas.map((item, i) => ({...item, origem: 'despesas', index: i}));
+        
+        const todos = [...salariosMapeados, ...despesasMapeados].sort((a, b) => b.data - a.data);
+        
         if (todos.length === 0) return "<p class='small center italic'>Nenhuma transação este mês.</p>";
 
         return todos.map(item => {
-            const isRenda = item.tipo === 'renda';
+            const isRenda = item.origem === 'salarios';
             const corValor = isRenda ? '#2ecc71' : '#e74c3c';
             const sinal = isRenda ? '+' : '-';
             const icon = isRenda ? 'fa-circle-chevron-up' : 'fa-circle-chevron-down';
+            
+            // Botão excluir só aparece se estiver no mês atual
+            const btnExcluir = (mesOffsetFinancas === 0) 
+                ? `<button onclick="excluirFinanca('${item.origem}', ${item.index})" style="background:transparent; border:none; color:#555; padding: 0 5px; cursor:pointer;"><i class="fas fa-trash"></i></button>`
+                : '';
             
             return `
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #222;">
@@ -2299,15 +2671,29 @@
                         <i class="fas ${icon}" style="color: ${corValor}; font-size: 0.8rem;"></i>
                         <div>
                             <p style="font-size: 0.85rem; margin:0;">${item.nome}</p>
-                            <span style="font-size: 0.6rem; color: #666; text-transform: uppercase;">${item.tipo}</span>
+                            <span style="font-size: 0.6rem; color: #666; text-transform: uppercase;">${isRenda ? 'Renda' : item.tipo}</span>
                         </div>
                     </div>
-                    <div style="text-align: right;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
                         <p style="font-size: 0.85rem; font-weight: bold; color: ${corValor}; margin:0;">${sinal} R$ ${item.valor.toFixed(2)}</p>
+                        ${btnExcluir}
                     </div>
                 </div>
             `;
         }).join('');
+    }
+
+    function excluirFinanca(origem, index) {
+        if (!confirm("Guerreiro, deseja realmente apagar este registro?")) return;
+        
+        if (origem === 'salarios') {
+            db.financas.salarios.splice(index, 1);
+        } else {
+            db.financas.despesas.splice(index, 1);
+        }
+        
+        salvarDB();
+        renderizarFinancas();
     }
 
     function criarBarraMeta(titulo, valor, rendaTotal, metaPorcent, cor) {
@@ -2326,6 +2712,31 @@
         `;
     }
 
+    function ajustarMetasFinanceiras() {
+        const n = prompt("Porcentagem para Necessário:", db.financas.metas.necessario);
+        if (n === null) return;
+        const l = prompt("Porcentagem para Lazer:", db.financas.metas.lazer);
+        if (l === null) return;
+        const g = prompt("Porcentagem para Legado:", db.financas.metas.legado);
+        if (g === null) return;
+
+        const total = parseInt(n) + parseInt(l) + parseInt(g);
+
+        if (total !== 100) {
+            alert("A soma deve ser 100%. (Atual: " + total + "%)");
+            return;
+        }
+
+        db.financas.metas = {
+            necessario: parseInt(n),
+            lazer: parseInt(l),
+            legado: parseInt(g)
+        };
+
+        salvarDB();
+        renderizarFinancas();
+    }
+
     function lancarFinanca(categoria) {
         const nome = prompt(`Descrição da ${categoria}:`);
         const valor = parseFloat(prompt("Valor (R$):"));
@@ -2334,7 +2745,7 @@
         if (categoria === 'renda') {
             db.financas.salarios.push({ nome, valor, data: Date.now(), tipo: 'renda' });
         } else {
-            const sub = prompt("Classifique este gasto:\n1. Necessário (Aluguel, Luz, Comida)\n2. Lazer (Saídas, Streaming, Hobbies)\n3. Legado (Dívidas, Investimentos)");
+            const sub = prompt("Classifique este gasto:\n1. Necessário\n2. Lazer\n3. Legado");
             let tipo = 'necessario';
             if (sub === '2') tipo = 'lazer';
             if (sub === '3') tipo = 'legado';
@@ -2383,10 +2794,20 @@
     window.renderizarFinancas = renderizarFinancas;
 </script>
 <script>
+    // --- 1. ESTILOS DO MODAL ---
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:9999; }
+        .modal-box { background:#1a1a1a; padding:20px; border:1px solid #d4af37; border-radius:8px; width:90%; max-width:400px; color:white; }
+        .modal-box input, .modal-box select { width:100%; padding:10px; margin:10px 0; background:#333; border:1px solid #555; color:white; border-radius:4px; box-sizing:border-box; }
+        .btn-modal { width:100%; padding:10px; background:#d4af37; border:none; color:black; font-weight:bold; cursor:pointer; margin-top:10px; }
+        .meta-concluida { border: 2px solid #2ecc71 !important; }
+        .badge-sucesso { color:#2ecc71; font-weight:bold; font-size: 0.8rem; }
+    `;
+    document.head.appendChild(style);
+
     function renderizarMetas() {
         const container = document.getElementById('view-metas');
-        
-        // Cálculo de Capacidade Financeira (Vem da Tesouraria)
         const totalRenda = db.financas.salarios.reduce((acc, curr) => acc + curr.valor, 0);
         const totalGasto = db.financas.despesas.reduce((acc, curr) => acc + curr.valor, 0);
         const sobraMensal = totalRenda - totalGasto;
@@ -2394,14 +2815,10 @@
         container.innerHTML = `
             <h2 class="gold center">Objetivos de Guerra</h2>
             <p class="small center" style="margin-bottom: 20px;">Transforme desejos em planos de conquista.</p>
-
             <button class="btn-guerreiro" onclick="abrirModalMeta()" style="margin-bottom: 20px;">
                 <i class="fas fa-bullseye"></i> Traçar Nova Meta
             </button>
-
-            <div id="lista-metas-cards">
-                ${renderizarCardsMetas(sobraMensal)}
-            </div>
+            <div id="lista-metas-cards">${renderizarCardsMetas(sobraMensal)}</div>
         `;
     }
 
@@ -2409,45 +2826,53 @@
         if (db.metas.length === 0) return `<p class="small center italic">Nenhuma meta traçada ainda.</p>`;
 
         return db.metas.map((meta, index) => {
+            // Lógica de Tempo (Calculado por milissegundos, reflete dias exatos)
+            const totalTempo = meta.prazo - meta.criadoEm;
+            const tempoPassado = Math.max(Date.now() - meta.criadoEm, 0);
+            const progressoTempo = Math.min(Math.max((tempoPassado / totalTempo) * 100, 0), 100);
+            const diasRestantes = Math.max(Math.ceil((meta.prazo - Date.now()) / (1000 * 60 * 60 * 24)), 0);
+
+            // Verifica se está concluída
+            const isConcluida = meta.valorAtual >= meta.valorObjetivo && meta.tipo !== 'habito';
+
             let infoExtra = "";
-            let progressoFin = 0;
+            
+            // Barra de Progresso de Tempo
+            infoExtra += `
+                <div style="margin-bottom:15px;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.6rem; color:#888;">
+                        <span>TEMPO</span><span>${diasRestantes} dias restantes</span>
+                    </div>
+                    <div class="progress-outer" style="height:6px; background:#222;"><div class="progress-inner" style="width:${progressoTempo}%; background:#3498db;"></div></div>
+                </div>
+            `;
 
             // Lógica Financeira
             if (meta.tipo === 'dinheiro' || meta.tipo === 'ambos') {
                 const mesesRestantes = sobra > 0 ? Math.ceil((meta.valorObjetivo - meta.valorAtual) / sobra) : "∞";
-                progressoFin = (meta.valorAtual / meta.valorObjetivo) * 100;
+                const progressoFin = (meta.valorAtual / meta.valorObjetivo) * 100;
+                
                 infoExtra += `
                     <div style="margin-top:10px; border-top:1px solid #333; padding-top:10px;">
-                        <p class="small gold">FINANCEIRO: R$ ${meta.valorAtual} / R$ ${meta.valorObjetivo}</p>
-                        <div class="progress-outer" style="height:6px;"><div class="progress-inner" style="width:${Math.min(progressoFin, 100)}%"></div></div>
-                        <p class="small" style="font-size:0.65rem;">Capacidade atual: R$ ${sobra.toFixed(2)}/mês. <br> 
-                        <b>Estimativa: ${mesesRestantes} meses</b> para concluir.</p>
-                    </div>
-                `;
-            }
-
-            // Lógica de Hábito
-            if (meta.tipo === 'habito' || meta.tipo === 'ambos') {
-                infoExtra += `
-                    <div style="margin-top:10px; border-top:1px solid #333; padding-top:10px;">
-                        <p class="small" style="color:#3498db;"><i class="fas fa-Sync"></i> REQUER DISCIPLINA</p>
-                        <p class="small" style="font-size:0.65rem;">Lembre-se de adicionar os hábitos necessários no seu <b>Pergaminho</b> para sustentar esta meta.</p>
+                        <p class="small gold">FINANCEIRO: R$ ${meta.valorAtual.toFixed(2)} / R$ ${meta.valorObjetivo.toFixed(2)}</p>
+                        <div class="progress-outer" style="height:6px;"><div class="progress-inner" style="width:${Math.min(progressoFin, 100)}%; background: ${isConcluida ? '#2ecc71' : '#d4af37'}"></div></div>
+                        ${!isConcluida ? `<p class="small" style="font-size:0.65rem;">Capacidade: R$ ${sobra.toFixed(2)}/mês. <b>Estimativa: ${mesesRestantes} meses</b>.</p>` : ''}
                     </div>
                 `;
             }
 
             return `
-                <div class="card card-guerreiro">
+                <div class="card card-guerreiro ${isConcluida ? 'meta-concluida' : ''}">
                     <div style="display:flex; justify-content:space-between; align-items:start;">
                         <div>
                             <h4 class="gold">${meta.nome.toUpperCase()}</h4>
-                            <p class="small">Prazo: ${new Date(meta.prazo).toLocaleDateString('pt-BR')}</p>
+                            ${isConcluida ? '<p class="badge-sucesso">✓ META CONCLUÍDA</p>' : `<p class="small">Prazo: ${new Date(meta.prazo).toLocaleDateString('pt-BR')}</p>`}
                         </div>
                         <button onclick="excluirMeta(${index})" style="background:none; border:none; color:var(--cor-perigo);"><i class="fas fa-trash"></i></button>
                     </div>
                     ${infoExtra}
-                    <div style="margin-top:15px; display:flex; gap:10px;">
-                        ${meta.tipo !== 'habito' ? `<button class="btn-guerreiro" style="font-size:0.6rem; padding:5px;" onclick="aportarMeta(${index})">APORTAR DINHEIRO</button>` : ''}
+                    <div style="margin-top:15px;">
+                        ${(meta.tipo !== 'habito' && !isConcluida) ? `<button class="btn-guerreiro" style="font-size:0.6rem; padding:5px; width:100%" onclick="modalAportar(${index})">APORTAR DINHEIRO</button>` : ''}
                     </div>
                 </div>
             `;
@@ -2455,48 +2880,76 @@
     }
 
     function abrirModalMeta() {
-        const nome = prompt("Qual o nome da sua meta? (Ex: Comprar Carro, Shape de Verão)");
-        if (!nome) return;
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `
+            <div class="modal-box">
+                <h3>Nova Meta</h3>
+                <input type="text" id="m-nome" placeholder="Nome (Ex: Viagem)">
+                <select id="m-tipo">
+                    <option value="dinheiro">Dinheiro</option>
+                    <option value="habito">Hábito</option>
+                    <option value="ambos">Dinheiro e Hábito</option>
+                </select>
+                <input type="number" id="m-valor" placeholder="Valor Total (R$)">
+                <input type="number" id="m-meses" placeholder="Meses para atingir">
+                <button class="btn-modal" onclick="salvarMetaDoModal()">CONFIRMAR</button>
+                <button class="btn-modal" style="background:#555;" onclick="this.parentElement.parentElement.remove()">CANCELAR</button>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+    }
 
-        const tipo = prompt("O que essa meta exige?\n1. Apenas Dinheiro\n2. Apenas Hábitos\n3. Dinheiro e Hábitos");
-        let tipoFinal = 'dinheiro';
-        if (tipo === '2') tipoFinal = 'habito';
-        if (tipo === '3') tipoFinal = 'ambos';
+    function salvarMetaDoModal() {
+        const nome = document.getElementById('m-nome').value;
+        const tipo = document.getElementById('m-tipo').value;
+        const valor = parseFloat(document.getElementById('m-valor').value) || 0;
+        const meses = parseInt(document.getElementById('m-meses').value) || 1;
 
-        let valorMeta = 0;
-        if (tipoFinal !== 'habito') {
-            valorMeta = parseFloat(prompt("Quanto dinheiro você precisa no total?"));
-        }
+        if(!nome) return alert("Dê um nome à meta!");
 
-        const prazo = prompt("Em quantos meses pretende realizar?");
         const dataPrazo = new Date();
-        dataPrazo.setMonth(dataPrazo.getMonth() + parseInt(prazo || 1));
+        dataPrazo.setMonth(dataPrazo.getMonth() + meses);
 
         db.metas.push({
             nome,
-            tipo: tipoFinal,
-            valorObjetivo: valorMeta,
+            tipo: tipo,
+            valorObjetivo: valor,
             valorAtual: 0,
             prazo: dataPrazo.getTime(),
             criadoEm: Date.now()
         });
 
         salvarDB();
+        document.querySelector('.modal-overlay').remove();
         renderizarMetas();
-
-        if (tipoFinal === 'habito' || tipoFinal === 'ambos') {
-            alert("🏛️ CONSELHO DO MESTRE:\nEsta meta exige constância. Vá agora ao 'Pergaminho' e crie hábitos que te levem a esse objetivo!");
-        }
     }
 
-    function aportarMeta(index) {
-        const valor = parseFloat(prompt("Quanto você está guardando para esta meta agora?"));
+    function modalAportar(index) {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `
+            <div class="modal-box">
+                <h3>Quanto vai aportar?</h3>
+                <input type="number" id="input-aporte" placeholder="Valor R$">
+                <button class="btn-modal" onclick="confirmarAporte(${index})">CONFIRMAR</button>
+                <button class="btn-modal" style="background:#555;" onclick="this.parentElement.parentElement.remove()">CANCELAR</button>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+    }
+
+    function confirmarAporte(index) {
+        const valorInput = document.getElementById('input-aporte').value;
+        const valor = parseFloat(valorInput);
         if (isNaN(valor)) return;
         
         db.metas[index].valorAtual += valor;
         
-        // Opcional: Registrar como uma saída na tesouraria automaticamente
-        if(confirm("Deseja registrar esse valor como uma saída de 'Legado' nas suas finanças?")) {
+        // Verifica se atingiu a meta
+        const atingiu = db.metas[index].valorAtual >= db.metas[index].valorObjetivo;
+        
+        if(confirm("Deseja registrar como saída na tesouraria?")) {
             db.financas.despesas.push({
                 nome: `Reserva: ${db.metas[index].nome}`,
                 valor: valor,
@@ -2505,8 +2958,13 @@
             });
         }
         
+        document.querySelector('.modal-overlay').remove();
         salvarDB();
         renderizarMetas();
+
+        if (atingiu) {
+            alert("🏆 PARABÉNS! Você atingiu sua meta de '" + db.metas[index].nome + "'! Continue avançando!");
+        }
     }
 
     function excluirMeta(index) {
@@ -3054,7 +3512,6 @@ function abrirDetalhesPlano(index) {
         return;
     }
     
-    // Se for PRO, renderiza os detalhes do plano (Parte 5)
     renderizarDetalhesPlanoEfetivo(index);
 }
 
@@ -3068,30 +3525,120 @@ function verificarAcessoProTreino() {
 }
 
 // 5. LÓGICA DO CRONÔMETRO (DISPONÍVEL PARA TODOS)
+
+// estado persistido
 let tempoSegundos = 0;
 let cronAtivo = null;
+let cronData = {
+    inicio: null,
+    acumulado: 0,
+    rodando: false
+};
 
-function gerenciarCronometro(acao) {
-    const display = document.getElementById('cronometro-display');
-    
-    if (acao === 'start') {
-        if (cronAtivo) return;
-        cronAtivo = setInterval(() => {
-            tempoSegundos++;
-            const m = Math.floor(tempoSegundos / 60).toString().padStart(2, '0');
-            const s = (tempoSegundos % 60).toString().padStart(2, '0');
-            display.innerText = `${m}:${s}`;
-        }, 1000);
-    } else if (acao === 'pause') {
-        clearInterval(cronAtivo);
-        cronAtivo = null;
-    } else if (acao === 'reset') {
-        clearInterval(cronAtivo);
-        cronAtivo = null;
-        tempoSegundos = 0;
-        display.innerText = "00:00";
+// carregar estado salvo
+function carregarEstadoCronometro() {
+    const salvo = localStorage.getItem('cronometro_estado');
+    if (salvo) {
+        cronData = JSON.parse(salvo);
     }
 }
+
+// salvar estado
+function salvarEstadoCronometro() {
+    localStorage.setItem('cronometro_estado', JSON.stringify(cronData));
+}
+
+// atualizar display
+function atualizarDisplayCronometro() {
+    const display = document.getElementById('cronometro-display');
+    if (!display) return;
+
+    let total = cronData.acumulado;
+
+    if (cronData.rodando && cronData.inicio) {
+        const agora = Date.now();
+        total += Math.floor((agora - cronData.inicio) / 1000);
+    }
+
+    tempoSegundos = total;
+
+    const m = Math.floor(total / 60).toString().padStart(2, '0');
+    const s = (total % 60).toString().padStart(2, '0');
+    display.innerText = `${m}:${s}`;
+}
+
+// loop leve só pra renderizar (não controla tempo real)
+function iniciarLoopRender() {
+    if (cronAtivo) return;
+
+    cronAtivo = setInterval(() => {
+        atualizarDisplayCronometro();
+    }, 1000);
+}
+
+function pararLoopRender() {
+    clearInterval(cronAtivo);
+    cronAtivo = null;
+}
+
+function gerenciarCronometro(acao) {
+    carregarEstadoCronometro();
+
+    if (acao === 'start') {
+        if (cronData.rodando) return;
+
+        cronData.inicio = Date.now();
+        cronData.rodando = true;
+
+        salvarEstadoCronometro();
+        iniciarLoopRender();
+
+    } else if (acao === 'pause') {
+        if (!cronData.rodando) return;
+
+        const agora = Date.now();
+        cronData.acumulado += Math.floor((agora - cronData.inicio) / 1000);
+        cronData.inicio = null;
+        cronData.rodando = false;
+
+        salvarEstadoCronometro();
+        pararLoopRender();
+        atualizarDisplayCronometro();
+
+    } else if (acao === 'reset') {
+        cronData = {
+            inicio: null,
+            acumulado: 0,
+            rodando: false
+        };
+
+        tempoSegundos = 0;
+
+        salvarEstadoCronometro();
+        pararLoopRender();
+        atualizarDisplayCronometro();
+    }
+}
+
+// reconstruir estado ao voltar pra tela
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+        carregarEstadoCronometro();
+        if (cronData.rodando) {
+            iniciarLoopRender();
+        }
+        atualizarDisplayCronometro();
+    }
+});
+
+// garantir atualização inicial ao carregar
+setTimeout(() => {
+    carregarEstadoCronometro();
+    if (cronData.rodando) {
+        iniciarLoopRender();
+    }
+    atualizarDisplayCronometro();
+}, 100);
 /* ============================================================
    MÓDULO DE TREINO ESTOICO - PARTE 5: DETALHES DO PLANO (PRO)
    ============================================================ */
@@ -3651,6 +4198,114 @@ function inicializarModuloTreino() {
 */
 
 console.log("⚔️ Módulo de Treinos VoxFlow carregado com sucesso.");
+</script>
+<style>
+    #guia-diario-overlay {
+        position: fixed; top:0; left:0; width:100%; height:100%; 
+        background: rgba(0,0,0,0.85); z-index: 99999;
+        display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .guia-card {
+        background: var(--bg-card); border: 2px solid var(--cor-ouro);
+        border-radius: 15px; padding: 25px; max-width: 400px; text-align: center;
+        box-shadow: 0 0 30px rgba(212,175,55,0.3);
+    }
+    .guia-card h2 { color: var(--cor-ouro); margin-bottom: 15px; }
+    .guia-card p { margin-bottom: 20px; color: var(--texto-p); font-size: 1rem; }
+</style>
+
+<div id="guia-diario-overlay">
+    <div class="guia-card">
+        <h2 id="guia-titulo">Bem-vindo, Guerreiro</h2>
+        <p id="guia-texto"></p>
+        <button class="btn-guerreiro" onclick="fecharGuia()">ENTENDIDO, MESTRE</button>
+    </div>
+</div>
+
+<script>
+function fecharGuia() {
+    document.getElementById('guia-diario-overlay').style.display = 'none';
+}
+
+function verificarGuiaDiario() {
+    // 1. Define hoje à meia-noite para evitar erros de horário
+    const hojeObj = new Date();
+    hojeObj.setHours(0, 0, 0, 0);
+
+    // 2. Define data de instalação à meia-noite
+    const instalacaoObj = new Date(db.usuario.dataInstalacao);
+    instalacaoObj.setHours(0, 0, 0, 0);
+
+    // 3. Calcula diferença em dias (Math.round garante precisão)
+    const diffTime = hojeObj - instalacaoObj;
+    const diaAtual = Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+    // 4. Se passou de 7 dias, encerra o ciclo
+    if (diaAtual > 7 || diaAtual < 1) return;
+
+    // 5. Verifica se já viu o guia hoje
+    const chaveData = hojeObj.toDateString();
+    if (localStorage.getItem('guia_visto_' + chaveData)) return;
+
+    const mensagens = {
+        1: { t: "Dia 1: A Jornada Começa", m: "Bem-vindo ao Caminho do Guerreiro! Vamos começar devagar. Gerencie seus hábitos, adicione ou remova conforme sua realidade. Dica: Clique no botão <b>Elite</b> no menu inferior para ler o Manual e entender como conquistar o seu domínio total." },
+        2: { t: "Dia 2: Ordem e Progresso", m: "O guerreiro não vive no caos. Agora é hora de gerenciar suas tarefas. Vá na sua agenda (clique no ícone de calendário no menu) e registre o que precisa ser feito hoje. A disciplina começa com o planejamento." },
+        3: { t: "Dia 3: Domínio Financeiro", m: "Para ser livre, você precisa ter clareza. Que tal ver para onde seu dinheiro está indo? Acesse a função de <b>Finanças</b> no menu '+' e comece a registrar suas entradas e saídas." },
+        4: { t: "Dia 4: O Escudo do Guerreiro", m: "O maior inimigo é aquele que reside em nós. Hoje, orientamos você a enfrentar seus vícios. Vá na seção <b>Escudo</b> (ícone de escudo) e registre algo que você quer superar. O app está aqui para proteger sua evolução." },
+        5: { t: "Dia 5: Reflexão Noturna", m: "O aprendizado que não é registrado é um aprendizado perdido. Ao anoitecer, use o botão <b>Diário</b> no menu '+' para registrar o que você aprendeu com os erros e acertos de hoje." },
+        6: { t: "Dia 6: Seus Pilares", m: "Um guerreiro sem valores é um barco sem leme. Vá na aba <b>Honra</b> (ícone de medalha), confira seus valores inegociáveis ou registre novos. Defina metas claras na aba <b>Metas</b>." },
+        7: { t: "Dia 7: A Prova de Fogo", m: "Parabéns por chegar até aqui! Hoje, desafiamos você a iniciar o <b>Desafio de 7 dias</b> na aba de Desafios. Acompanhe sua evolução no gráfico e veja o aço da sua disciplina sendo forjado." }
+    };
+
+    const msg = mensagens[diaAtual];
+    if (msg) {
+        document.getElementById('guia-titulo').innerHTML = msg.t;
+        document.getElementById('guia-texto').innerHTML = msg.m;
+        document.getElementById('guia-diario-overlay').style.display = 'flex';
+        
+        // Marca como visto para a data de hoje
+        localStorage.setItem('guia_visto_' + chaveData, 'true');
+    }
+}
+
+// Executa após o carregamento da página
+window.addEventListener('load', () => {
+    setTimeout(verificarGuiaDiario, 2000); 
+});
+</script>
+<script>
+function verificarBackup() {
+    const dataInstalacao = new Date(db.usuario.dataInstalacao);
+    const hoje = new Date();
+    const hojeStr = hoje.toDateString();
+    
+    // Verifica se o aviso do guia diário já foi visto hoje (para não atropelar)
+    const guiaJaVisto = localStorage.getItem('guia_visto_' + hojeStr);
+    
+    // Calcula quantos dias se passaram
+    const diffTime = hoje - dataInstalacao;
+    const diasPassados = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    // Lógica: Aparece se for dia par, E se o guia diário NÃO tiver aparecido hoje
+    if (diasPassados > 0 && diasPassados % 2 === 0 && !guiaJaVisto) {
+        
+        const jaVistoBackup = localStorage.getItem('backup_visto_' + hojeStr);
+        
+        if (!jaVistoBackup) {
+            document.getElementById('guia-titulo').innerHTML = "🛡️ Proteja seu Progresso";
+            document.getElementById('guia-texto').innerHTML = "Guerreiro, a disciplina exige consistência. Para evitar perder seus dados caso troque de aparelho, <b>faça um backup agora!</b> Vá nas configurações e exporte seus dados. <b>Dica: apague backups antigos e mantenha apenas o mais recente</b>. É rápido e garante que seu legado permaneça salvo.";
+            document.getElementById('guia-diario-overlay').style.display = 'flex';
+            
+            localStorage.setItem('backup_visto_' + hojeStr, 'true');
+        }
+    }
+}
+
+// Executa com um tempo maior (ex: 5 segundos) para garantir 
+// que o guia diário tenha prioridade total
+window.addEventListener('load', () => {
+    setTimeout(verificarBackup, 5000); 
+});
 </script>
 </body>
 </html>
