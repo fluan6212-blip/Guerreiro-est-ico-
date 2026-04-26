@@ -1,5 +1,5 @@
 // Este é o Escudo Offline do Software Ferreira
-const CACHE_NAME = 'ferreira-v2';
+const CACHE_NAME = 'ferreira-v3';
 const assets = [
   './',
   './index.html',
@@ -25,7 +25,7 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
-        keys.filter(key => key !== CACHE_NAME) // Deleta o V1 e mantém só o V2
+        keys.filter(key => key !== CACHE_NAME) // Deleta o V2 e mantém só o V3
             .map(key => caches.delete(key))
       );
     })
